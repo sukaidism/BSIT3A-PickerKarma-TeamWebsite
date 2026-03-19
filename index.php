@@ -80,70 +80,70 @@
 
             <div class="team-grid">
                 <article class="team-card">
-                    <img class="team-photo" src="https://via.placeholder.com/220" alt="Paul Richard G. Calma">
+                    <img class="team-photo" src="assets\IMG_2809.jpg" alt="Paul Richard G. Calma">
                     <div class="team-meta">
                         <div class="team-role">PROJECT COORDINATOR</div>
                         <h3 class="team-name">Paul Richard G. Calma</h3>
                         <p class="team-desc">Paul guides the team with a steady hand, keeping the project on track and tasks well-coordinated. He champions clear communication and ensures the system meets its goals.</p>
                     </div>
                     <div class="team-social" aria-label="LinkedIn link">
-                        <a href="#" class="social-link" aria-label="LinkedIn">
+                        <a href="https://www.linkedin.com/in/paul-richard-calma-106516280/" class="social-link" aria-label="LinkedIn">
                             <i class="fa-brands fa-linkedin-in" aria-hidden="true"></i>
                         </a>
                     </div>
                 </article>
 
                 <article class="team-card">
-                    <img class="team-photo" src="https://via.placeholder.com/220" alt="Emill Robin M. Echate">
+                    <img class="team-photo" src="assets\848d51dc-2d52-466f-a133-e1cafc0bf929.jpg" alt="Emill Robin M. Echate">
                     <div class="team-meta">
-                        <div class="team-role">TEAM MEMBER</div>
+                        <div class="team-role">DOCUMENT SPECIALIST</div>
                         <h3 class="team-name">Emill Robin M. Echate</h3>
                         <p class="team-desc">Emill curates the project's story, preparing clear documentation, detailed reports, and polished presentations. He keeps every proposal and update organized and professional.</p>
                     </div>
                     <div class="team-social" aria-label="LinkedIn link">
-                        <a href="#" class="social-link" aria-label="LinkedIn">
+                        <a href="https://www.linkedin.com/in/emill-robin-echate-a966a9378" class="social-link" aria-label="LinkedIn">
                             <i class="fa-brands fa-linkedin-in" aria-hidden="true"></i>
                         </a>
                     </div>
                 </article>
 
                 <article class="team-card">
-                    <img class="team-photo" src="https://via.placeholder.com/220" alt="Thaffeia Mharei T. Haavik">
+                    <img class="team-photo" src="assets\1771914743929.jpg" alt="Thaffeia Mharei T. Haavik">
                     <div class="team-meta">
-                        <div class="team-role">TEAM MEMBER</div>
+                        <div class="team-role">INTEGRATION SPECIALIST / TESTER</div>
                         <h3 class="team-name">Thaffeia Mharei T. Haavik</h3>
                         <p class="team-desc">Thaffeia brings all the pieces together, rigorously testing for errors and performance issues. She ensures every feature works flawlessly before the system goes live.</p>
                     </div>
                     <div class="team-social" aria-label="LinkedIn link">
-                        <a href="#" class="social-link" aria-label="LinkedIn">
+                        <a href="https://www.linkedin.com/in/thaffeia-mharei-haavik-644126378/" class="social-link" aria-label="LinkedIn">
                             <i class="fa-brands fa-linkedin-in" aria-hidden="true"></i>
                         </a>
                     </div>
                 </article>
 
                 <article class="team-card">
-                    <img class="team-photo" src="https://via.placeholder.com/220" alt="Sean Gabriel S. Santos">
+                    <img class="team-photo" src="assets\9a53b880-c4ac-4d8d-8922-d111a23d53e0.jpg" alt="Sean Gabriel S. Santos">
                     <div class="team-meta">
-                        <div class="team-role">TEAM MEMBER</div>
+                        <div class="team-role">BACKEND DEVELOPER</div>
                         <h3 class="team-name">Sean Gabriel S. Santos</h3>
                         <p class="team-desc">Sean powers the heart of the Barangay Management System, expertly managing databases and system logic. He ensures data flows securely and efficiently behind the scenes.</p>
                     </div>
                     <div class="team-social" aria-label="LinkedIn link">
-                        <a href="#" class="social-link" aria-label="LinkedIn">
+                        <a href="https://www.linkedin.com/in/sean-gabriel-santos-039b31377/" class="social-link" aria-label="LinkedIn">
                             <i class="fa-brands fa-linkedin-in" aria-hidden="true"></i>
                         </a>
                     </div>
                 </article>
 
                 <article class="team-card">
-                    <img class="team-photo" src="https://via.placeholder.com/220" alt="Gabriele D. Tabing">
+                    <img class="team-photo" src="assets\6cbefebb-29b0-4d14-a550-cc763c98fbdc.jpg" alt="Gabriele D. Tabing">
                     <div class="team-meta">
-                        <div class="team-role">TEAM MEMBER</div>
+                        <div class="team-role">FRONTEND DEVELOPER / UI DESIGNER</div>
                         <h3 class="team-name">Gabriele D. Tabing</h3>
                         <p class="team-desc">Gabriele crafts the user interface, creating a seamless, inviting experience. She makes sure every page and module is clear, accessible, and a pleasure to use.</p>
                     </div>
                     <div class="team-social" aria-label="LinkedIn link">
-                        <a href="#" class="social-link" aria-label="LinkedIn">
+                        <a href="https://www.linkedin.com/in/gabriele-tabing-5a991a358/" class="social-link" aria-label="LinkedIn">
                             <i class="fa-brands fa-linkedin-in" aria-hidden="true"></i>
                         </a>
                     </div>
@@ -163,16 +163,13 @@
 
                 <div class="project-lead">Project Description</div>
                 <p class="project-text">
-                    The Barangay Management System is a digital solution designed to help barangay offices manage records, services, and transactions more efficiently.
-                    Many barangays still rely on manual paperwork, which can lead to delays, misplaced records, and difficulty in serving residents quickly.
-                    This project aims to address these challenges by providing a centralized and organized system for barangay operations.
+                The Barangay Management System provides a modern digital solution that streamlines how barangay offices manage records, services, and transactions. By consolidating processes into a single, organized platform, the system reduces paperwork, minimizes the risk of lost files, and enables faster, more efficient service for residents.
                 </p>
                 <p class="project-text">
-                    The main purpose of the project is to improve the efficiency, accuracy, and accessibility of barangay services. Through this system,
-                    barangay staff can manage resident information, issue documents, monitor requests, and keep records in a more reliable way.
+                The project aims to make barangay services faster, more accurate, and easier to access. Staff can efficiently manage resident information, issue documents, track requests, and maintain records with greater confidence and reliability.
                 </p>
                 <p class="project-text">
-                    The target users of the system are barangay staff, barangay officials, and residents who need faster and more convenient public service transactions.
+                This system serves barangay staff, officials, and residents seeking quicker and more convenient public service transactions.
                 </p>
             </div>
 
