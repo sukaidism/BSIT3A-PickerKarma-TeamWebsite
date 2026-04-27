@@ -19,6 +19,7 @@
             <a class="nav-link" href="#home">Home</a>
             <a class="nav-link" href="#team">Team</a>
             <a class="nav-link" href="#project">Project</a>
+            <a class="nav-link" href="#video">Video</a>
             <a class="nav-link" href="#updates">Updates</a>
         </nav>
     </div>
@@ -259,6 +260,32 @@
         </div>
     </section>
 
+    <!-- EXPLAINER VIDEO -->
+    <section id="video" class="video-block anchor">
+        <div class="container video-block-inner">
+            <div class="video-eyebrow">Watch the Explainer</div>
+            <h2 class="video-title">See PickerKarma in Action</h2>
+            <p class="video-subtitle">
+                Watch our final explainer video where we break down the core concepts of System Integration and Architecture &mdash; covering how systems communicate, integrate, and work together as a unified whole.
+            </p>
+
+            <div class="video-wrapper" id="videoWrapper">
+                <iframe
+                    class="video-player"
+                    src="https://www.youtube.com/embed/aYRytyuGjwA?rel=0&modestbranding=1"
+                    title="PickerKarma — System Integration and Architecture Final Explainer Video"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowfullscreen
+                ></iframe>
+            </div>
+
+            <div class="video-caption">
+                <span class="video-caption-dot" aria-hidden="true"></span>
+                PickerKarma &mdash; System Integration and Architecture &middot; BSIT 3A Final Explainer Video
+            </div>
+        </div>
+    </section>
+
     <!-- PROJECT UPDATES TIMELINE -->
     <section id="updates" class="updates-block anchor">
         <div class="container updates-inner">
@@ -322,6 +349,7 @@
             <a href="#home">Home</a>
             <a href="#team">Our Team</a>
             <a href="#project">Our Project</a>
+            <a href="#video">Video</a>
             <a href="#updates">Updates</a>
         </nav>
     </div>

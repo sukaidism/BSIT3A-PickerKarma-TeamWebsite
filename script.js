@@ -108,4 +108,21 @@
   document.querySelectorAll('.tl-item').forEach(function (el) {
     revealObserver.observe(el);
   });
+
+  /* ── Scroll-reveal for the explainer video wrapper ── */
+  const videoWrapper = document.getElementById('videoWrapper');
+  if (videoWrapper) {
+    const vidObserver = new IntersectionObserver(
+      function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('vid-visible');
+            vidObserver.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.12 }
+    );
+    vidObserver.observe(videoWrapper);
+  }
 })();

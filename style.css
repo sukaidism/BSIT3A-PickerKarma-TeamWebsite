@@ -1130,6 +1130,123 @@ body{
   }
 }
 
+/* ─── EXPLAINER VIDEO ────────────────────────── */
+.video-block{
+  padding: 5rem 0 4.5rem;
+  background: var(--bg);
+}
+
+.video-block-inner{
+  text-align: center;
+}
+
+.video-eyebrow{
+  display: inline-flex;
+  align-items: center;
+  padding: 0.42rem 0.9rem;
+  border-radius: 999px;
+  background: rgba(124, 58, 237, 0.08);
+  color: var(--pink);
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  margin-bottom: 0.9rem;
+}
+
+.video-title{
+  margin: 0 0 0.5rem;
+  font-size: 2.2rem;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+  color: var(--text);
+}
+
+.video-subtitle{
+  margin: 0 auto 2.5rem;
+  max-width: 58ch;
+  color: var(--muted);
+  font-size: 0.925rem;
+  line-height: 1.85;
+  font-weight: 400;
+}
+
+/* Wrapper that provides the glow / glass frame */
+.video-wrapper{
+  position: relative;
+  max-width: 860px;
+  margin: 0 auto;
+  border-radius: 22px;
+  overflow: hidden;
+  box-shadow:
+    0 0 0 1px rgba(124, 58, 237, 0.13),
+    0 32px 80px rgba(60, 40, 120, 0.18),
+    0 8px 24px rgba(60, 40, 120, 0.10);
+  background: #1e1b2e;
+  /* Subtle purple glow behind the player */
+  isolation: isolate;
+}
+
+.video-wrapper::before{
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: 24px;
+  background: linear-gradient(135deg,
+    rgba(124, 58, 237, 0.35) 0%,
+    rgba(99, 102, 241, 0.2) 50%,
+    rgba(124, 58, 237, 0.15) 100%);
+  z-index: -1;
+  opacity: 0.7;
+  filter: blur(1px);
+}
+
+/* The video / iframe player */
+.video-player{
+  display: block;
+  width: 100%;
+  border: none;
+  border-radius: 22px;
+  background: #000;
+  aspect-ratio: 16 / 9;
+  outline: none;
+}
+
+/* Caption strip below the video */
+.video-caption{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  margin-top: 1.35rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--muted);
+  letter-spacing: 0.01em;
+}
+
+.video-caption-dot{
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--pink);
+  opacity: 0.55;
+  flex-shrink: 0;
+}
+
+/* Entrance animation */
+.video-wrapper{
+  opacity: 0;
+  transform: translateY(24px) scale(0.985);
+  transition: opacity 0.75s ease, transform 0.75s ease;
+}
+
+.video-wrapper.vid-visible{
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
 /* ─── RESPONSIVE ─────────────────────────────── */
 @media (max-width: 980px){
   .hero-layout   { grid-template-columns: 1fr; }
