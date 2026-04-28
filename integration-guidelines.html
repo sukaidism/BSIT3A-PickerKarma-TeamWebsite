@@ -1,0 +1,1412 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Integration Guidelines | PickerKarma</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Calistoga&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+        crossorigin="anonymous" referrerpolicy="no-referrer">
+    <link rel="stylesheet" href="app.css">
+</head>
+
+<body class="page-docs">
+    <header class="docs-topbar">
+        <div class="docs-wrap topbar-inner">
+            <a href="index.html" class="brand">PickerKarma</a>
+            <div class="topbar-actions">
+                <a href="index.html#integrations" class="btn btn-ghost">← Back to Integrations</a>
+                <a href="api-docs.html" class="btn btn-ghost">API Docs</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="docs-wrap docs-layout">
+
+        <!-- ── SIDEBAR ──────────────────────────────────────────────── -->
+        <aside class="docs-sidebar" aria-label="Integration guidelines sections">
+            <h2 class="sidebar-title">Guidelines</h2>
+            <nav>
+                <p class="sidebar-group">Architecture</p>
+                <a class="side-link" href="#architecture">Architecture Overview</a>
+                <a class="side-link" href="#components">System Components</a>
+                <a class="side-link" href="#data-flow">Data Flow</a>
+                <a class="side-link" href="#scalability">Scalability</a>
+                <a class="side-link" href="#security">Security</a>
+                <a class="side-link" href="#limitations">Limitations</a>
+
+                <p class="sidebar-group">Service Integration</p>
+                <a class="side-link" href="#overview">System Overview</a>
+                <a class="side-link" href="#authentication">Authentication</a>
+                <a class="side-link" href="#api-usage">API Usage Examples</a>
+                <a class="side-link" href="#workflow-stripe">Stripe Workflow</a>
+                <a class="side-link" href="#workflow-zapier">Zapier Workflow</a>
+                <a class="side-link" href="#workflow-n8n">n8n — Blotter AI Summary</a>
+                <a class="side-link" href="#workflow-n8n-backup">n8n — DB Backup</a>
+                <a class="side-link" href="#workflow-pusher">Pusher Workflow</a>
+                <a class="side-link" href="#workflow-redis">Redis Workflow</a>
+                <a class="side-link" href="#workflow-email">Email Workflow</a>
+            </nav>
+        </aside>
+
+        <!-- ── MAIN CONTENT ─────────────────────────────────────────── -->
+        <main class="docs-content">
+
+            <!-- ═══════════════════════════════════════════════════════
+                 ARCHITECTURE
+                 ═══════════════════════════════════════════════════════ -->
+
+            <section id="architecture" class="doc-section">
+                <div class="section-label">
+                    <span class="label-dot pulsing-dot"></span>
+                    <span>Architecture</span>
+                </div>
+                <h1>Integration Guidelines</h1>
+                <p>
+                    This document describes how the Barangay Management System integrates with external services —
+                    covering its architecture, data flows, security controls, and step-by-step workflow explanations
+                    for each integration point.
+                </p>
+                <div class="note">
+                    <strong>Sanitization notice:</strong> credentials, secrets, webhook URLs, and sample personal data shown here are redacted demonstration values only.
+                </div>
+
+                <h2>Architecture Overview</h2>
+                <p>
+                    The system follows a <strong>layered monolith with external service delegation</strong> pattern.
+                    Laravel handles all business logic and routing. External services are invoked asynchronously through
+                    queued jobs and respond through dedicated callback endpoints — keeping the core application
+                    decoupled from third-party reliability.
+                </p>
+
+                <!-- Architecture Diagram -->
+                <div class="arch-diagram">
+                    <div class="arch-layer">
+                        <div class="arch-node node-client">
+                            <div class="arch-node-icon"><i class="fa-solid fa-display"></i></div>
+                            <div>
+                                <strong>Browser</strong>
+                                <span>Resident Portal · Admin Portal</span>
+                                <span class="arch-tech">Livewire 4 · Tailwind CSS · Chart.js · Pusher Echo</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="arch-connector">
+                        <span class="arch-line"></span>
+                        <span class="arch-label">HTTPS · WebSocket</span>
+                        <span class="arch-line"></span>
+                    </div>
+
+                    <div class="arch-layer">
+                        <div class="arch-node node-app">
+                            <div class="arch-node-icon"><i class="fa-brands fa-laravel"></i></div>
+                            <div>
+                                <strong>Laravel 13 Application</strong>
+                                <span>Routes · Controllers · Livewire · Services · Jobs · Events</span>
+                                <span class="arch-tech">PHP 8.3 · Sanctum · Queue Workers · Scheduler</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="arch-connector">
+                        <span class="arch-line"></span>
+                        <span class="arch-label">Drivers · SDKs · HTTP</span>
+                        <span class="arch-line"></span>
+                    </div>
+
+                    <div class="arch-services-row">
+                        <div class="arch-service-node node-db">
+                            <i class="fa-solid fa-database"></i>
+                            <strong>MySQL</strong>
+                            <span>Primary Store</span>
+                        </div>
+                        <div class="arch-service-node node-redis">
+                            <i class="fa-solid fa-server"></i>
+                            <strong>Redis</strong>
+                            <span>Cache · Session · Queue</span>
+                        </div>
+                        <div class="arch-service-node node-pusher">
+                            <i class="fa-solid fa-tower-broadcast"></i>
+                            <strong>Pusher</strong>
+                            <span>WebSocket Broadcast</span>
+                        </div>
+                        <div class="arch-service-node node-stripe">
+                            <i class="fa-brands fa-stripe-s"></i>
+                            <strong>Stripe</strong>
+                            <span>Payments</span>
+                        </div>
+                        <div class="arch-service-node node-smtp">
+                            <i class="fa-solid fa-envelope"></i>
+                            <strong>SMTP</strong>
+                            <span>Email Delivery</span>
+                        </div>
+                        <div class="arch-service-node node-auto">
+                            <i class="fa-solid fa-gears"></i>
+                            <strong>n8n · Zapier</strong>
+                            <span>Automation</span>
+                        </div>
+                    </div>
+
+                    <div class="arch-connector">
+                        <span class="arch-line arch-line-right"></span>
+                        <span class="arch-label">Webhook Callbacks</span>
+                        <span class="arch-line arch-line-right"></span>
+                    </div>
+
+                    <div class="arch-layer arch-layer-narrow">
+                        <div class="arch-node node-external">
+                            <div class="arch-node-icon" style="background: linear-gradient(135deg, #0061ff, #1a8cff);"><i class="fa-brands fa-dropbox"></i></div>
+                            <div>
+                                <strong>Dropbox · Google Docs</strong>
+                                <span>Backup storage · Document generation output</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="components" class="doc-section">
+                <h2>System Components</h2>
+                <p>Each layer has a single responsibility. External services are accessed only through designated
+                    service classes, jobs, or controllers — never directly from routes or Blade templates.</p>
+
+                <div class="component-grid">
+                    <div class="component-card">
+                        <div class="comp-head">
+                            <span class="comp-badge comp-client">Client</span>
+                            <h3>Browser Layer</h3>
+                        </div>
+                        <ul>
+                            <li>Livewire 4 components for reactive UI (queues, tables, filters)</li>
+                            <li>Pusher Echo for WebSocket subscription to user channels</li>
+                            <li>Chart.js for dashboard analytics rendering</li>
+                            <li>Vite 8 bundles Tailwind CSS 4 + Alpine.js</li>
+                        </ul>
+                    </div>
+
+                    <div class="component-card">
+                        <div class="comp-head">
+                            <span class="comp-badge comp-app">Application</span>
+                            <h3>Laravel Application</h3>
+                        </div>
+                        <ul>
+                            <li><strong>Controllers</strong> — AdminController, ResidentProfileController, DocumentRequestController, IncidentReportController, CommunityEventController + dedicated payment and webhook handlers</li>
+                            <li><strong>Livewire</strong> — IncidentQueue, DocumentQueue, ResidentTable (search, filter, pagination)</li>
+                            <li><strong>Jobs</strong> — SendZapierWebhookJob, SendN8nIncidentWebhookJob (queued, 3 retries)</li>
+                            <li><strong>Services</strong> — ImageStorageService, PortalRealtimeNotificationService, IncidentNotificationService, EventNotificationService</li>
+                            <li><strong>Scheduler</strong> — Daily DB backup trigger via routes/console.php</li>
+                        </ul>
+                    </div>
+
+                    <div class="component-card">
+                        <div class="comp-head">
+                            <span class="comp-badge comp-data">Data</span>
+                            <h3>MySQL Database</h3>
+                        </div>
+                        <ul>
+                            <li>Primary store for all models: User, ResidentProfile, DocumentRequest, IncidentReport, CommunityEvent, EventRegistration, BlotterHearing</li>
+                            <li>Fallback for sessions and cache if Redis is unavailable</li>
+                            <li>Full SQL dump exported by DatabaseBackupController for backup</li>
+                        </ul>
+                    </div>
+
+                    <div class="component-card">
+                        <div class="comp-head">
+                            <span class="comp-badge comp-infra">Infrastructure</span>
+                            <h3>Redis</h3>
+                        </div>
+                        <ul>
+                            <li>Session store — <code>SESSION_DRIVER=redis</code></li>
+                            <li>Application cache — <code>CACHE_STORE=redis</code> with 30-second TTL on dashboard counts</li>
+                            <li>Queue driver — <code>QUEUE_CONNECTION=redis</code>; workers process Zapier and n8n jobs</li>
+                        </ul>
+                    </div>
+
+                    <div class="component-card">
+                        <div class="comp-head">
+                            <span class="comp-badge comp-ext">External</span>
+                            <h3>Pusher</h3>
+                        </div>
+                        <ul>
+                            <li>Receives broadcast events from Laravel via the Pusher PHP SDK</li>
+                            <li>Delivers notifications to subscribed browser clients over WebSocket</li>
+                            <li>Per-user private channels — channel name includes user ID</li>
+                            <li>Self-hosted alternative: Laravel Reverb (<code>BROADCAST_CONNECTION=reverb</code>)</li>
+                        </ul>
+                    </div>
+
+                    <div class="component-card">
+                        <div class="comp-head">
+                            <span class="comp-badge comp-ext">External</span>
+                            <h3>Stripe</h3>
+                        </div>
+                        <ul>
+                            <li>Creates Checkout Sessions for document fees, incident case fees, and event registration fees</li>
+                            <li>Sends <code>checkout.session.completed</code> webhook after successful payment</li>
+                            <li>Refunds processed via Stripe API on document rejection</li>
+                            <li>No card data ever touches the application server</li>
+                        </ul>
+                    </div>
+
+                    <div class="component-card">
+                        <div class="comp-head">
+                            <span class="comp-badge comp-ext">External</span>
+                            <h3>SMTP / Email</h3>
+                        </div>
+                        <ul>
+                            <li>16 Mailable classes covering every user-facing event</li>
+                            <li>Sent synchronously or via queue depending on context</li>
+                            <li>Mailpit used locally (<code>host: &lt;LOCAL_SMTP_HOST&gt;, port: 2525</code>) to intercept and preview all emails</li>
+                            <li>Production: any SMTP provider via <code>MAIL_HOST / MAIL_USERNAME / MAIL_PASSWORD</code></li>
+                        </ul>
+                    </div>
+
+                    <div class="component-card">
+                        <div class="comp-head">
+                            <span class="comp-badge comp-auto">Automation</span>
+                            <h3>n8n</h3>
+                        </div>
+                        <ul>
+                            <li>Receives incident status events from <code>SendN8nIncidentWebhookJob</code></li>
+                            <li>Passes incident data to an LLM for AI summary generation</li>
+                            <li>Posts summary back to <code>POST /api/n8n/incident-summary</code></li>
+                            <li>Separately: fetches database dump from <code>GET /api/backup/database</code> and uploads ZIP to Dropbox</li>
+                        </ul>
+                    </div>
+
+                    <div class="component-card">
+                        <div class="comp-head">
+                            <span class="comp-badge comp-auto">Automation</span>
+                            <h3>Zapier</h3>
+                        </div>
+                        <ul>
+                            <li>Receives approved document data from <code>SendZapierWebhookJob</code></li>
+                            <li>Populates a Google Docs template with applicant data</li>
+                            <li>Posts the completed document URL back to <code>POST /api/zapier/document-ready</code></li>
+                            <li>Laravel stores the URL on the DocumentRequest and emails the resident</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section id="data-flow" class="doc-section">
+                <h2>Data Flow Between Systems</h2>
+
+                <h3>Payment Flow (Stripe)</h3>
+                <ol class="flow-steps">
+                    <li class="flow-step">
+                        <span class="step-num">1</span>
+                        <div><strong>Resident initiates payment</strong> — clicks Pay on a document, incident fee, or event registration.</div>
+                    </li>
+                    <li class="flow-step">
+                        <span class="step-num">2</span>
+                        <div><strong>Laravel creates Stripe Checkout Session</strong> — returns a <code>checkout_url</code> with line items and a <code>success_url</code>/<code>cancel_url</code>.</div>
+                    </li>
+                    <li class="flow-step">
+                        <span class="step-num">3</span>
+                        <div><strong>Browser redirects to Stripe-hosted checkout</strong> — Stripe collects and processes card data securely.</div>
+                    </li>
+                    <li class="flow-step">
+                        <span class="step-num">4</span>
+                        <div><strong>Stripe fires <code>checkout.session.completed</code> webhook</strong> to <code>POST /stripe/webhook</code>.</div>
+                    </li>
+                    <li class="flow-step">
+                        <span class="step-num">5</span>
+                        <div><strong>StripeWebhookController verifies signature</strong> using <code>STRIPE_WEBHOOK_SECRET</code>, then updates the record status.</div>
+                    </li>
+                    <li class="flow-step">
+                        <span class="step-num">6</span>
+                        <div><strong>Notification dispatched</strong> — Pusher broadcasts to resident's channel; confirmation email sent via SMTP.</div>
+                    </li>
+                    <li class="flow-step">
+                        <span class="step-num">7</span>
+                        <div><strong>Browser shows updated status</strong> — Livewire re-renders the queue with the new state.</div>
+                    </li>
+                </ol>
+
+                <h3>Document Generation Flow (Zapier)</h3>
+                <ol class="flow-steps">
+                    <li class="flow-step">
+                        <span class="step-num">1</span>
+                        <div><strong>Admin approves document request</strong> — <code>AdminController@approveDocument</code> updates status to <code>approved</code>.</div>
+                    </li>
+                    <li class="flow-step">
+                        <span class="step-num">2</span>
+                        <div><strong><code>SendZapierWebhookJob</code> dispatched to queue</strong> — carries full applicant and document data as JSON payload.</div>
+                    </li>
+                    <li class="flow-step">
+                        <span class="step-num">3</span>
+                        <div><strong>Queue worker sends HTTP POST to Zapier Catch Hook</strong> — payload includes control number, name, address, purpose, and callback URL.</div>
+                    </li>
+                    <li class="flow-step">
+                        <span class="step-num">4</span>
+                        <div><strong>Zapier workflow runs</strong> — populates a Google Docs template with the applicant's data, generates the official document.</div>
+                    </li>
+                    <li class="flow-step">
+                        <span class="step-num">5</span>
+                        <div><strong>Zapier calls back to <code>POST /api/zapier/document-ready</code></strong> — payload contains <code>control_number</code> and <code>document_url</code>.</div>
+                    </li>
+                    <li class="flow-step">
+                        <span class="step-num">6</span>
+                        <div><strong><code>ZapierCallbackController</code> stores the URL</strong> on the DocumentRequest, then sends <code>DocumentApprovedMail</code> with the Google Docs link to the resident.</div>
+                    </li>
+                </ol>
+
+                <h3>AI Incident Summary Flow (n8n — Barangay Blotter Events)</h3>
+                <ol class="flow-steps">
+                    <li class="flow-step">
+                        <span class="step-num">1</span>
+                        <div><strong>Admin triggers summary</strong> — either automatically when an outcome is recorded (<code>setIncidentOutcome()</code>) or manually via the "Generate Summary" button on the incident detail page.</div>
+                    </li>
+                    <li class="flow-step">
+                        <span class="step-num">2</span>
+                        <div><strong>Laravel POSTs to <code>Webhook — Incident Events</code> node</strong> — payload includes <code>event: "generate_summary"</code>, all incident fields, and a <code>callback_url</code> + <code>callback_secret</code> for the response.</div>
+                    </li>
+                    <li class="flow-step">
+                        <span class="step-num">3</span>
+                        <div><strong><code>Filter</code> node checks <code>event === "generate_summary"</code></strong> — non-matching events (other lifecycle webhooks) are silently dropped; only summaries continue.</div>
+                    </li>
+                    <li class="flow-step">
+                        <span class="step-num">4</span>
+                        <div><strong><code>AI Agent</code> runs with Google Gemini</strong> — a structured prompt is built from the incident fields and sent to Google Gemini Chat Model; output is a 3–5 sentence formal blotter summary in <code>$json.output</code>.</div>
+                    </li>
+                    <li class="flow-step">
+                        <span class="step-num">5</span>
+                        <div><strong><code>HTTP Request</code> node posts back to <code>callback_url</code></strong> — sends <code>control_number</code>, <code>summary</code>, and <code>callback_secret</code> to <code>POST /api/n8n/incident-summary</code>.</div>
+                    </li>
+                    <li class="flow-step">
+                        <span class="step-num">6</span>
+                        <div><strong><code>N8nCallbackController</code> verifies the secret and stores the result</strong> — sets <code>ai_summary</code> and <code>ai_summary_generated_at</code> on the <code>IncidentReport</code> model.</div>
+                    </li>
+                </ol>
+
+                <h3>Database Backup Flow (n8n)</h3>
+                <ol class="flow-steps">
+                    <li class="flow-step">
+                        <span class="step-num">1</span>
+                        <div><strong>Trigger</strong> — Laravel scheduler fires daily at 02:00 via <code>routes/console.php</code>, or admin clicks "Backup to Dropbox" on the Maintenance page.</div>
+                    </li>
+                    <li class="flow-step">
+                        <span class="step-num">2</span>
+                        <div><strong>Laravel POSTs to <code>BACKUP_N8N_WEBHOOK_URL</code></strong> — payload includes <code>source</code> (scheduled / admin_manual) and timestamp.</div>
+                    </li>
+                    <li class="flow-step">
+                        <span class="step-num">3</span>
+                        <div><strong>n8n workflow calls <code>GET /api/backup/database</code></strong> with the <code>X-Backup-Secret</code> header — Laravel generates a full PDO-based SQL dump, compresses it to ZIP, and streams the file.</div>
+                    </li>
+                    <li class="flow-step">
+                        <span class="step-num">4</span>
+                        <div><strong>n8n uploads the ZIP to Dropbox</strong> — file is stored under <code>barangay-backups/</code> with a timestamped filename.</div>
+                    </li>
+                </ol>
+            </section>
+
+            <section id="scalability" class="doc-section">
+                <h2>Scalability Considerations</h2>
+
+                <div class="consideration-grid">
+                    <div class="consideration-card">
+                        <div class="con-icon"><i class="fa-solid fa-layer-group"></i></div>
+                        <h3>Stateless Application Layer</h3>
+                        <p>Controllers contain no in-process state. Sessions are stored in Redis, not on-server memory — allowing multiple application server instances to serve the same user without sticky sessions.</p>
+                    </div>
+                    <div class="consideration-card">
+                        <div class="con-icon"><i class="fa-solid fa-arrows-split-up-and-left"></i></div>
+                        <h3>Horizontal Queue Scaling</h3>
+                        <p>Job workers (<code>php artisan queue:work</code>) are stateless and can run on any machine with Redis access. Outbound Zapier and n8n calls are always queued — never blocking an HTTP response.</p>
+                    </div>
+                    <div class="consideration-card">
+                        <div class="con-icon"><i class="fa-solid fa-bolt"></i></div>
+                        <h3>Cache Layer</h3>
+                        <p>Dashboard count queries use <code>Cache::remember('portal.counts.*', 30, ...)</code>. A 30-second TTL eliminates repeated COUNT queries on busy admin panels. Cache is invalidated immediately after write operations.</p>
+                    </div>
+                    <div class="consideration-card">
+                        <div class="con-icon"><i class="fa-solid fa-rotate"></i></div>
+                        <h3>Job Retry and Backoff</h3>
+                        <p>Both <code>SendZapierWebhookJob</code> and <code>SendN8nIncidentWebhookJob</code> retry 3 times with 20–30 second backoff. This absorbs transient external service outages without manual intervention.</p>
+                    </div>
+                    <div class="consideration-card">
+                        <div class="con-icon"><i class="fa-solid fa-key"></i></div>
+                        <h3>Idempotency on n8n Incidents</h3>
+                        <p>The n8n incident webhook payload includes an <code>idempotency_key</code> (<code>id:eventType:timestamp</code>), allowing n8n to detect and discard duplicate deliveries caused by queue retries.</p>
+                    </div>
+                    <div class="consideration-card">
+                        <div class="con-icon"><i class="fa-solid fa-cloud"></i></div>
+                        <h3>Real-time Failover</h3>
+                        <p>Pusher can be swapped for self-hosted Laravel Reverb by changing <code>BROADCAST_CONNECTION=reverb</code> — no application code changes required. Notification persistence is database-backed regardless of broadcast status.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="security" class="doc-section">
+                <h2>Security Considerations</h2>
+
+                <div class="consideration-grid">
+                    <div class="consideration-card con-security">
+                        <div class="con-icon con-icon-sec"><i class="fa-solid fa-signature"></i></div>
+                        <h3>Stripe Signature Verification</h3>
+                        <p>Every incoming Stripe webhook is verified using <code>STRIPE_WEBHOOK_SECRET</code> and Stripe's HMAC-SHA256 signature scheme. Requests failing verification are rejected before any processing.</p>
+                    </div>
+                    <div class="consideration-card con-security">
+                        <div class="con-icon con-icon-sec"><i class="fa-solid fa-shield-halved"></i></div>
+                        <h3>Backup Endpoint Secret</h3>
+                        <p>The database dump endpoint (<code>GET /api/backup/database</code>) requires an <code>X-Backup-Secret</code> header matching <code>BACKUP_API_SECRET</code>. Without it, the endpoint returns 401.</p>
+                    </div>
+                    <div class="consideration-card con-security">
+                        <div class="con-icon con-icon-sec"><i class="fa-solid fa-lock"></i></div>
+                        <h3>n8n Callback Verification</h3>
+                        <p>n8n posts a <code>callback_secret</code> field in its AI summary callback payload. <code>N8nCallbackController</code> compares it against <code>N8N_WEBHOOK_SECRET</code> before writing to the database.</p>
+                    </div>
+                    <div class="consideration-card con-security">
+                        <div class="con-icon con-icon-sec"><i class="fa-solid fa-file-shield"></i></div>
+                        <h3>CSRF Exemption Scope</h3>
+                        <p>Only the Stripe webhook route and the two n8n/Zapier callback routes are CSRF-exempt, declared explicitly in <code>bootstrap/app.php</code>. All browser-facing POST routes remain CSRF-protected.</p>
+                    </div>
+                    <div class="consideration-card con-security">
+                        <div class="con-icon con-icon-sec"><i class="fa-solid fa-eye-slash"></i></div>
+                        <h3>Credentials in Environment</h3>
+                        <p>No secrets appear in source code or version control. All API keys, webhook secrets, and database passwords are loaded exclusively from <code>.env</code>, which is listed in <code>.gitignore</code>.</p>
+                    </div>
+                    <div class="consideration-card con-security">
+                        <div class="con-icon con-icon-sec"><i class="fa-solid fa-credit-card"></i></div>
+                        <h3>PCI Scope Minimization</h3>
+                        <p>Card data never touches the Laravel application. Stripe Checkout is fully hosted by Stripe. The application only receives a <code>session_id</code> and a signed webhook — removing PCI DSS scope from the app server.</p>
+                    </div>
+                    <div class="consideration-card con-security">
+                        <div class="con-icon con-icon-sec"><i class="fa-solid fa-image"></i></div>
+                        <h3>Image Upload Safety</h3>
+                        <p>All uploads pass through <code>ImageStorageService</code>, which re-encodes files as JPEG using PHP's GD library — stripping any embedded executable payloads or metadata. Output is capped at 2.5 MB.</p>
+                    </div>
+                    <div class="consideration-card con-security">
+                        <div class="con-icon con-icon-sec"><i class="fa-solid fa-user-shield"></i></div>
+                        <h3>Admin Middleware Isolation</h3>
+                        <p>All admin routes are protected by both <code>auth</code> and a custom <code>admin</code> middleware that verifies <code>is_admin = true</code>. Resident tokens cannot access admin endpoints — returning 403.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="limitations" class="doc-section">
+                <h2>Limitations of the Integration Solution</h2>
+
+                <div class="limitation-list">
+                    <div class="limitation-item">
+                        <div class="lim-header">
+                            <span class="lim-badge lim-medium">Medium</span>
+                            <h3>Zapier Callback Has No HMAC Verification</h3>
+                        </div>
+                        <p>The <code>POST /api/zapier/document-ready</code> endpoint has no shared-secret verification. Any caller knowing the endpoint URL and a valid <code>control_number</code> could inject a fraudulent document URL. Mitigation: add a <code>X-Zapier-Secret</code> header check and validate on the callback controller.</p>
+                    </div>
+
+                    <div class="limitation-item">
+                        <div class="lim-header">
+                            <span class="lim-badge lim-low">Low</span>
+                            <h3>Local Filesystem Image Storage</h3>
+                        </div>
+                        <p>Resident ID photos, selfies, and incident evidence are stored on the local filesystem (<code>FILESYSTEM_DISK=local</code>). This is not replicated across servers — horizontal scaling requires a shared storage solution such as AWS S3 or Cloudinary.</p>
+                    </div>
+
+                    <div class="limitation-item">
+                        <div class="lim-header">
+                            <span class="lim-badge lim-low">Low</span>
+                            <h3>Full Database Dump Only</h3>
+                        </div>
+                        <p>The backup system generates a complete SQL dump of all tables on every run. There is no incremental or differential backup. As the database grows, dump time and file size will increase proportionally. A future improvement would be point-in-time recovery or binary log-based incremental backup.</p>
+                    </div>
+
+                    <div class="limitation-item">
+                        <div class="lim-header">
+                            <span class="lim-badge lim-medium">Medium</span>
+                            <h3>Pusher Availability Dependency</h3>
+                        </div>
+                        <p>Real-time notifications depend on Pusher's availability. During Pusher outages, no WebSocket events reach the browser — users must refresh to see status changes. Persisted notifications in the database remain accessible, but the real-time experience degrades. Switching to Reverb eliminates this dependency.</p>
+                    </div>
+
+                    <div class="limitation-item">
+                        <div class="lim-header">
+                            <span class="lim-badge lim-low">Low</span>
+                            <h3>No Email Bounce Tracking</h3>
+                        </div>
+                        <p>The SMTP integration does not include delivery receipts or bounce handling. Failed email delivery is logged as an exception, but no retry or fallback notification channel exists. Consider integrating a transactional email provider (Postmark, Resend) that exposes delivery webhooks.</p>
+                    </div>
+
+                    <div class="limitation-item">
+                        <div class="lim-header">
+                            <span class="lim-badge lim-low">Low</span>
+                            <h3>Zapier Free Plan Task Limits</h3>
+                        </div>
+                        <p>The Zapier integration runs on a plan with monthly task limits. High document request volumes during peak periods could exhaust the task quota. A self-hosted n8n workflow for document generation would remove this constraint entirely.</p>
+                    </div>
+
+                    <div class="limitation-item">
+                        <div class="lim-header">
+                            <span class="lim-badge lim-low">Low</span>
+                            <h3>Redis Single Point of Failure</h3>
+                        </div>
+                        <p>Sessions, cache, and queues all share a single Redis instance. If Redis becomes unavailable, the application falls back to database drivers for sessions and cache, causing degraded performance. A Redis Sentinel or Cluster configuration would address this for production deployments.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ═══════════════════════════════════════════════════════
+                 SERVICE INTEGRATION
+                 ═══════════════════════════════════════════════════════ -->
+
+            <section id="overview" class="doc-section">
+                <div class="section-label">
+                    <span class="label-dot pulsing-dot"></span>
+                    <span>Service Integration</span>
+                </div>
+                <h2>System Overview</h2>
+                <p>
+                    The integration model is <strong>webhook-out / callback-in</strong>. Laravel dispatches
+                    outbound calls through queued jobs and receives responses on dedicated, unauthenticated
+                    (or lightly authenticated) callback endpoints. This keeps the core request cycle fast
+                    and makes each integration independently replaceable.
+                </p>
+
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Service</th>
+                                <th>Type</th>
+                                <th>Outbound Trigger</th>
+                                <th>Inbound Callback</th>
+                                <th>Auth Method</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Stripe</strong></td>
+                                <td>Payment</td>
+                                <td>Checkout Session creation</td>
+                                <td><code>POST /stripe/webhook</code></td>
+                                <td>Signature header</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Zapier</strong></td>
+                                <td>Automation</td>
+                                <td><code>SendZapierWebhookJob</code></td>
+                                <td><code>POST /api/zapier/document-ready</code></td>
+                                <td>None (control_number only)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>n8n (Incidents)</strong></td>
+                                <td>AI / Automation</td>
+                                <td><code>SendN8nIncidentWebhookJob</code></td>
+                                <td><code>POST /api/n8n/incident-summary</code></td>
+                                <td>callback_secret field</td>
+                            </tr>
+                            <tr>
+                                <td><strong>n8n (Backup)</strong></td>
+                                <td>Automation</td>
+                                <td>Scheduler / Admin button</td>
+                                <td><code>GET /api/backup/database</code> ← n8n pulls</td>
+                                <td>X-Backup-Secret header</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Pusher</strong></td>
+                                <td>Realtime</td>
+                                <td><code>PortalRealtimeNotificationService</code></td>
+                                <td>None (push only)</td>
+                                <td>App key / secret</td>
+                            </tr>
+                            <tr>
+                                <td><strong>SMTP</strong></td>
+                                <td>Email</td>
+                                <td>Mailable classes (16 types)</td>
+                                <td>None (send only)</td>
+                                <td>SMTP credentials</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Redis</strong></td>
+                                <td>Infrastructure</td>
+                                <td>Automatic (sessions, cache, queue)</td>
+                                <td>None</td>
+                                <td>Redis password (optional)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="authentication" class="doc-section">
+                <h2>Authentication Instructions</h2>
+                <p>Each integration uses a different authentication method. Below is the setup guide for each.</p>
+
+                <h3>Stripe</h3>
+                <div class="note">Set <code>STRIPE_KEY</code> (publishable), <code>STRIPE_SECRET</code> (secret), and <code>STRIPE_WEBHOOK_SECRET</code> (webhook signing secret from the Stripe Dashboard under Webhooks).</div>
+                <div class="code-block">
+                    <pre><code>STRIPE_KEY=pk_test_...
+STRIPE_SECRET=sk_test_...
+STRIPE_WEBHOOK_SECRET=whsec_...</code></pre>
+                </div>
+                <p class="muted">Register the webhook endpoint in Stripe Dashboard, under Developers then Webhooks. Add endpoint: <code>https://&lt;REDACTED_PORTAL_HOST&gt;/stripe/webhook</code>. Listen for <code>checkout.session.completed</code>.</p>
+
+                <h3>n8n Incident Webhook</h3>
+                <div class="note">Obtain the Webhook Trigger URL from your n8n workflow. Set a shared secret that both sides agree on.</div>
+                <div class="code-block">
+                    <pre><code>N8N_INCIDENT_WEBHOOK_URL=https://&lt;REDACTED_N8N_HOST&gt;/webhook/incident-summary
+N8N_WEBHOOK_SECRET=&lt;REDACTED_SHARED_SECRET&gt;</code></pre>
+                </div>
+                <p class="muted">The secret is sent outbound in the <code>X-Portal-Webhook-Secret</code> header. n8n must include it as <code>callback_secret</code> in the AI summary callback payload.</p>
+
+                <h3>n8n Database Backup</h3>
+                <div class="code-block">
+                    <pre><code>BACKUP_N8N_WEBHOOK_URL=https://&lt;REDACTED_N8N_HOST&gt;/webhook/db-backup
+BACKUP_API_SECRET=&lt;REDACTED_BACKUP_SECRET&gt;</code></pre>
+                </div>
+                <p class="muted">n8n must include <code>X-Backup-Secret: &lt;REDACTED_BACKUP_SECRET&gt;</code> when calling <code>GET /api/backup/database</code>. Without this header the endpoint returns 401.</p>
+
+                <h3>Zapier</h3>
+                <div class="code-block">
+                    <pre><code>ZAPIER_WEBHOOK_URL=https://&lt;REDACTED_ZAPIER_HOST&gt;/hooks/catch/&lt;REDACTED_HOOK_ID&gt;/</code></pre>
+                </div>
+                <p class="muted">No outbound authentication is required beyond the URL. The Zapier callback to <code>/api/zapier/document-ready</code> has no secret — the <code>control_number</code> is used to match the correct DocumentRequest.</p>
+
+                <h3>Pusher</h3>
+                <div class="code-block">
+                    <pre><code>PUSHER_APP_ID=your_app_id
+PUSHER_APP_KEY=your_app_key
+PUSHER_APP_SECRET=your_app_secret
+PUSHER_APP_CLUSTER=ap1
+BROADCAST_CONNECTION=pusher
+
+# Also expose to Vite for the frontend Echo client:
+VITE_PUSHER_APP_KEY="${PUSHER_APP_KEY}"
+VITE_PUSHER_APP_CLUSTER="${PUSHER_APP_CLUSTER}"</code></pre>
+                </div>
+
+                <h3>Redis</h3>
+                <div class="code-block">
+                    <pre><code>REDIS_HOST=&lt;REDIS_HOST&gt;
+REDIS_PORT=6379
+REDIS_PASSWORD=null        # set if Redis requires auth
+SESSION_DRIVER=redis
+CACHE_STORE=redis
+QUEUE_CONNECTION=redis</code></pre>
+                </div>
+
+                <h3>SMTP / Email</h3>
+                <div class="code-block">
+                    <pre><code>MAIL_MAILER=smtp
+MAIL_HOST=&lt;SMTP_HOST&gt;
+MAIL_PORT=587
+MAIL_USERNAME=&lt;REDACTED_SMTP_USER&gt;
+MAIL_PASSWORD=&lt;REDACTED_SMTP_PASSWORD&gt;
+MAIL_SCHEME=tls
+MAIL_FROM_ADDRESS=no-reply@example.invalid
+MAIL_FROM_NAME="Barangay Pickerkarma"</code></pre>
+                </div>
+                <p class="muted">For local development, use Mailpit: <code>MAIL_HOST=&lt;LOCAL_SMTP_HOST&gt; MAIL_PORT=2525 MAIL_MAILER=smtp</code>. All outgoing emails are intercepted in the local Mailpit UI.</p>
+            </section>
+
+            <section id="api-usage" class="doc-section">
+                <h2>API Usage Examples</h2>
+                <p>These are the integration-specific endpoints. For general resident/admin API usage, see the <a href="api-docs.html">API Docs</a>.</p>
+
+                <h3>Trigger Database Backup (Admin Session)</h3>
+                <p class="muted">Requires an active admin browser session (cookie-authenticated). Fires the n8n backup webhook.</p>
+                <div class="code-block">
+                    <pre><code>POST /admin/backup/trigger
+Cookie: laravel_session=...
+X-CSRF-TOKEN: ...
+
+# Response: 302 redirect back with flash message</code></pre>
+                </div>
+
+                <h3>Download Database Backup Directly (Admin Session)</h3>
+                <div class="code-block">
+                    <pre><code>GET /admin/backup/download
+Cookie: laravel_session=...
+
+# Response: application/zip stream
+# Filename: barangay-backup-2026-04-28-020000.zip</code></pre>
+                </div>
+
+                <h3>n8n Pulls the Database Dump</h3>
+                <div class="code-block">
+                    <pre><code>GET /api/backup/database
+X-Backup-Secret: &lt;REDACTED_BACKUP_SECRET&gt;
+
+# Response: 200 application/zip
+# or: 401 {"error":"Unauthorized"}</code></pre>
+                </div>
+
+                <h3>Zapier Posts Completed Document URL (Callback)</h3>
+                <div class="code-block">
+                    <pre><code>POST /api/zapier/document-ready
+Content-Type: application/json
+
+{
+  "control_number": "DOC-2026-00012",
+  "document_url": "https://docs.example.invalid/document/generated-file"
+}
+
+# Response: {"status":"ok","control_number":"DOC-2026-00012"}</code></pre>
+                </div>
+
+                <h3>n8n Posts AI Incident Summary (Callback)</h3>
+                <div class="code-block">
+                    <pre><code>POST /api/n8n/incident-summary
+Content-Type: application/json
+
+{
+  "callback_secret": "&lt;REDACTED_SHARED_SECRET&gt;",
+  "control_number": "BLT-2026-00003",
+  "summary": "On April 25, 2026, a complainant filed a noise complaint against a respondent ..."
+}
+
+# Response: {"status":"ok"} or {"error":"Unauthorized"}</code></pre>
+                </div>
+
+                <h3>Outbound Incident Webhook Payload (Laravel to n8n)</h3>
+                <div class="code-block">
+                    <pre><code>POST {N8N_INCIDENT_WEBHOOK_URL}
+X-Portal-Webhook-Secret: {N8N_WEBHOOK_SECRET}
+Content-Type: application/json
+
+{
+  "event_type": "outcome_recorded",
+  "idempotency_key": "42:outcome_recorded:1745798400",
+  "control_number": "BLT-2026-00003",
+  "incident_category": "Disturbance / Noise Complaint",
+  "incident_date": "2026-04-25",
+  "incident_location": "Purok 4, Barangay Pickerkarma",
+  "incident_narrative": "Loud music playing past midnight...",
+  "respondent": { "name": "Respondent Name", "contact": "&lt;REDACTED_CONTACT&gt;" },
+  "status": "Resolved / Settled",
+  "resolution_summary": "Both parties agreed to a 10pm curfew.",
+  "callback_url": "https://&lt;REDACTED_PORTAL_HOST&gt;/api/n8n/incident-summary",
+  "callback_secret": "&lt;REDACTED_SHARED_SECRET&gt;"
+}</code></pre>
+                </div>
+            </section>
+
+            <!-- ── WORKFLOWS ────────────────────────────────────────── -->
+
+            <section id="workflow-stripe" class="doc-section">
+                <h2>Stripe Workflow</h2>
+
+                <h3>Setup Checklist</h3>
+                <ul>
+                    <li>Create Stripe account and obtain API keys from the Dashboard.</li>
+                    <li>Add webhook endpoint in Dashboard, under Developers then Webhooks: <code>POST /stripe/webhook</code>.</li>
+                    <li>Subscribe to <code>checkout.session.completed</code> event only.</li>
+                    <li>Copy the Webhook Signing Secret to <code>STRIPE_WEBHOOK_SECRET</code>.</li>
+                    <li>Confirm the CSRF exemption for <code>/stripe/webhook</code> in <code>bootstrap/app.php</code>.</li>
+                </ul>
+
+                <h3>How Payment Metadata Links to Records</h3>
+                <p>When Laravel creates a Checkout Session, it passes <code>metadata</code> to Stripe identifying the record type and ID:</p>
+                <div class="code-block">
+                    <pre><code>// DocumentRequestController - Stripe session creation
+$session = $stripe->checkout->sessions->create([
+    'payment_method_types' => ['card'],
+    'line_items' => [[
+        'price_data' => [
+            'currency' => 'php',
+            'unit_amount' => $documentRequest->fee,
+            'product_data' => ['name' => $documentRequest->typeLabel()],
+        ],
+        'quantity' => 1,
+    ]],
+    'metadata' => [
+        'type'               => 'document_request',
+        'document_request_id'=> $documentRequest->id,
+    ],
+    'success_url' => route('documents.payment.success') . '?session_id={CHECKOUT_SESSION_ID}',
+    'cancel_url'  => route('documents.payment.cancel'),
+    'mode' => 'payment',
+]);</code></pre>
+                </div>
+
+                <p>The webhook controller reads <code>metadata.type</code> and <code>metadata.document_request_id</code> to locate and update the correct record.</p>
+
+                <h3>Testing Stripe Locally</h3>
+                <div class="code-block">
+                    <pre><code># Install Stripe CLI
+stripe listen --forward-to https://&lt;REDACTED_PORTAL_HOST&gt;/stripe/webhook
+
+# Use test card in Stripe Checkout:
+Card: 4242 4242 4242 4242
+Exp: any future date | CVC: any 3 digits</code></pre>
+                </div>
+            </section>
+
+            <section id="workflow-zapier" class="doc-section">
+                <h2>Zapier Workflow</h2>
+                <p>
+                    This Zap handles automated document generation for approved barangay clearances. When an admin
+                    approves a document request, Laravel dispatches <code>SendZapierWebhookJob</code> which triggers
+                    this four-step workflow — formatting the date, generating the official document from a Google Docs
+                    template, and posting the download link back to the portal.
+                </p>
+
+                <!-- Workflow screenshot -->
+                <figure class="workflow-screenshot">
+                    <img src="assets/zapier-workflow.png"
+                         alt="Zapier workflow editor showing four connected steps: 1. Webhooks by Zapier (Catch Hook) receives the document approval payload, 2. Formatter by Zapier formats the approved_at date to Asia/Manila timezone, 3. Google Docs creates a Barangay Clearance document from template, 4. Webhooks by Zapier POSTs the generated document URL back to the portal." />
+                </figure>
+
+                <!-- Step 1 -->
+                <h3><span class="node-num">1</span> Webhooks by Zapier — Catch Hook</h3>
+                <p>
+                    The entry point. Laravel's <code>SendZapierWebhookJob</code> fires an HTTP POST to this Zapier
+                    webhook URL whenever an admin approves a document request. The full applicant and document data
+                    arrives as JSON in the request body.
+                </p>
+                <div class="code-block">
+                    <pre><code>Trigger:  Webhooks by Zapier
+Action:   Catch Hook
+URL:      https://&lt;REDACTED_ZAPIER_HOST&gt;/hooks/catch/&lt;REDACTED_HOOK_ID&gt;/
+
+Incoming payload fields:
+  control_number, document_type, applicant_name, applicant_email,
+  applicant_address, purpose, fee, approved_at, approved_by, callback_url</code></pre>
+                </div>
+                <p class="muted">The <code>approved_at</code> timestamp arrives in UTC ISO 8601 format and needs to be converted to local time before inserting into the document template.</p>
+
+                <!-- Step 2 -->
+                <h3><span class="node-num">2</span> Formatter by Zapier — Date / Time</h3>
+                <p>
+                    Converts the <code>approved_at</code> timestamp from UTC to <strong>Asia/Manila</strong> timezone
+                    and formats it as a human-readable date string for the official document.
+                </p>
+                <div class="code-block">
+                    <pre><code>Action:    Formatter by Zapier — Format
+Transform: Date/Time Formatting
+
+Input:        {{approved_at}}        (from Step 1)
+From Timezone: UTC
+To Timezone:   Asia/Manila
+To Format:     MMMM DD YYYY          (e.g. "April 28 2026")</code></pre>
+                </div>
+                <div class="note">
+                    The formatted output is referenced in Step 3 as the <code>DATE_APPROVED</code> template field. Without this step, the document would show a raw ISO timestamp instead of a clean date.
+                </div>
+
+                <!-- Step 3 -->
+                <h3><span class="node-num">3</span> Google Docs — Create Document From Template</h3>
+                <p>
+                    Creates a new Google Doc by cloning a pre-made <strong>Barangay Clearance</strong> template
+                    stored in Google Drive. Template placeholders are replaced with the applicant's data. The
+                    generated document is also exported as PDF.
+                </p>
+                <div class="code-block">
+                    <pre><code>Action:    Google Docs — Create Document From Template
+Template:  Barangay_Clearance  (Google Docs template file)
+Folder:    Barangay_Pickerkarma (Google Drive output folder)
+
+Document Title:
+  {{control_number}} - Barangay Clearance
+
+Template Field Mapping:
+  CONTROL_NUMBER  ->  {{control_number}}      (from Step 1)
+  FULL_NAME       ->  {{applicant_name}}       (from Step 1)
+  ADDRESS         ->  {{applicant_address}}    (from Step 1)
+  PURPOSE         ->  {{purpose}}              (from Step 1)
+  DATE_APPROVED   ->  {{formatted_date}}       (from Step 2)
+
+Export Format:  PDF</code></pre>
+                </div>
+                <p class="muted">
+                    The Google Docs template uses placeholder tags like <code>{{CONTROL_NUMBER}}</code> in the document body.
+                    Zapier replaces each tag with the corresponding value from the webhook payload. The output includes
+                    both a Google Docs edit link and a PDF export link.
+                </p>
+
+                <!-- Step 4 -->
+                <h3><span class="node-num">4</span> Webhooks by Zapier — POST</h3>
+                <p>
+                    The final step sends the generated document's PDF link back to the Laravel portal. The portal
+                    stores the URL on the <code>DocumentRequest</code> record and emails the resident with the
+                    download link.
+                </p>
+                <div class="code-block">
+                    <pre><code>Action:   Webhooks by Zapier — POST
+URL:      https://&lt;REDACTED_PORTAL_HOST&gt;/api/zapier/document-ready
+Payload Type: Form
+
+POST Body:
+{
+  "control_number": "{{control_number}}",       (from Step 1)
+  "document_url":   "{{pdf_export_link}}"        (from Step 3 — exportLinks.application/pdf)
+}</code></pre>
+                </div>
+                <p>
+                    The portal's <code>ZapierCallbackController</code> matches the <code>control_number</code> to the
+                    corresponding <code>DocumentRequest</code>, stores the <code>document_url</code>, and dispatches
+                    <code>DocumentApprovedMail</code> to the resident with the Google Docs link.
+                </p>
+
+                <h3>Payload Fields Available in Zapier</h3>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Field</th>
+                                <th>Description</th>
+                                <th>Example</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>control_number</code></td><td>Unique document request ID</td><td>DOC-2026-00012</td></tr>
+                            <tr><td><code>document_type</code></td><td>Human-readable type label</td><td>Barangay Clearance</td></tr>
+                            <tr><td><code>applicant_name</code></td><td>Full name from resident profile</td><td>Resident Full Name</td></tr>
+                            <tr><td><code>applicant_email</code></td><td>Resident account email</td><td>resident@example.invalid</td></tr>
+                            <tr><td><code>applicant_address</code></td><td>House, street, purok</td><td>123 Mabini St., Purok 4</td></tr>
+                            <tr><td><code>purpose</code></td><td>Stated purpose of request</td><td>Employment requirement</td></tr>
+                            <tr><td><code>fee</code></td><td>Amount paid in pesos</td><td>100.00</td></tr>
+                            <tr><td><code>approved_at</code></td><td>ISO 8601 approval timestamp</td><td>2026-04-28T09:15:00+08:00</td></tr>
+                            <tr><td><code>approved_by</code></td><td>Staff member name</td><td>Admin User</td></tr>
+                            <tr><td><code>callback_url</code></td><td>Where Zapier should POST the result</td><td>.../api/zapier/document-ready</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>Environment Variable Required</h3>
+                <div class="code-block">
+                    <pre><code># Laravel .env
+ZAPIER_WEBHOOK_URL=https://&lt;REDACTED_ZAPIER_HOST&gt;/hooks/catch/&lt;REDACTED_HOOK_ID&gt;/</code></pre>
+                </div>
+            </section>
+
+            <section id="workflow-n8n" class="doc-section">
+                <h2>n8n Workflow — Barangay Blotter AI Summary</h2>
+                <p>
+                    This workflow receives incident event data from the Laravel portal, filters for the
+                    <code>generate_summary</code> event, generates a professional AI summary using
+                    Google Gemini, and posts the result back to the portal via callback.
+                </p>
+
+                <!-- Workflow screenshot -->
+                <figure class="workflow-screenshot">
+                    <img src="assets/n8n-workflow.png"
+                         alt="n8n workflow editor showing four connected nodes: Webhook (Incident Events) receives POST, passes to Filter (event equals generate_summary), then to AI Agent using Google Gemini Chat Model, then to HTTP Request which POSTs the summary back to the portal callback URL." />
+                </figure>
+
+                <!-- Node 1 -->
+                <h3><span class="node-num">1</span> Webhook — Incident Events</h3>
+                <p>The entry point. Laravel's <code>SendN8nIncidentWebhookJob</code> POSTs to this URL whenever an incident status changes or a summary is manually requested by the admin.</p>
+                <div class="code-block">
+                    <pre><code>Method:  POST
+Path:    incident-events
+URL:     https://&lt;REDACTED_N8N_HOST&gt;/webhook/incident-events</code></pre>
+                </div>
+                <p>The full incident payload arrives in <code>$json.body</code>. The webhook passes all data through to the Filter node before any processing occurs.</p>
+
+                <!-- Node 2 -->
+                <h3><span class="node-num">2</span> Filter — Event Type Guard</h3>
+                <p>Laravel sends webhooks for multiple incident lifecycle events (accepted for mediation, scheduled, outcome recorded, closed, etc.). The Filter ensures only <code>generate_summary</code> events proceed to the AI agent — all others are silently dropped.</p>
+                <div class="code-block">
+                    <pre><code>Condition (strict, case-sensitive):
+  $json.body.event  equals  "generate_summary"
+
+Combinator: AND
+Result if false: stop execution (item dropped)</code></pre>
+                </div>
+                <div class="note">
+                    <strong>Why this matters:</strong> The same webhook URL receives all incident events from the portal. Without this filter, the AI Agent would run on every status change — generating unnecessary summaries and API calls to Google Gemini.
+                </div>
+
+                <!-- Node 3 -->
+                <h3><span class="node-num">3</span> AI Agent — Google Gemini</h3>
+                <p>An n8n AI Agent node with a custom-defined prompt. The language model is connected via the <strong>Google Gemini Chat Model</strong> sub-node using a Google PaLM API credential.</p>
+
+                <h4>Prompt Template</h4>
+                <div class="code-block">
+                    <pre><code>You are a barangay records officer in the Philippines. Write a concise,
+professional 3–5 sentence summary of the following incident report for
+official barangay records.
+
+Case Number:  {{ $json.body.control_number }}
+Category:     {{ $json.body.incident_category }}
+Incident Date:{{ $json.body.incident_date }}
+Location:     {{ $json.body.incident_location }}
+Narrative:    {{ $json.body.incident_narrative }}
+Respondent:   {{ $json.body.respondent_name }}
+Witness:      {{ $json.body.witness_name }}
+Current Status:{{ $json.body.status }}
+Resolution:   {{ $json.body.resolution_summary }}
+
+Write in formal, third-person language. Focus on the facts.
+Suitable for an official barangay blotter document.</code></pre>
+                </div>
+
+                <h4>Google Gemini Chat Model (Sub-node)</h4>
+                <div class="code-block">
+                    <pre><code>Node type:   @n8n/n8n-nodes-langchain.lmChatGoogleGemini
+Credential:  Google Gemini (PaLM) API account
+Connected:   ai_languageModel to AI Agent</code></pre>
+                </div>
+                <p class="muted">The AI Agent output is available as <code>$json.output</code> in the next node — this is the generated summary text.</p>
+
+                <!-- Node 4 -->
+                <h3><span class="node-num">4</span> HTTP Request — Post Summary to Portal</h3>
+                <p>After the AI generates the summary, this node posts the result back to the portal's callback URL. The callback URL and secret are passed <em>by Laravel inside the original webhook payload</em> — n8n does not need them hardcoded.</p>
+                <div class="code-block">
+                    <pre><code>Method: POST
+URL:    {{ $('Webhook - Incident Events').item.json.body.callback_url }}
+
+Body (JSON):
+{
+  "control_number": "{{ $('Webhook - Incident Events').item.json.body.control_number }}",
+  "summary":        "{{ $json.output }}",
+  "callback_secret":"{{ $('Webhook - Incident Events').item.json.body.callback_secret }}"
+}</code></pre>
+                </div>
+                <p>The portal's <code>N8nCallbackController</code> verifies <code>callback_secret</code> against <code>N8N_WEBHOOK_SECRET</code>, then stores the summary on the <code>IncidentReport</code> model.</p>
+
+                <!-- Full payload reference -->
+                <h3>Complete Incoming Payload Reference</h3>
+                <p class="muted">This is the exact JSON body Laravel sends when triggering a summary. All fields map directly to n8n expressions via <code>$json.body.*</code>.</p>
+                <div class="code-block">
+                    <pre><code>POST https://&lt;REDACTED_N8N_HOST&gt;/webhook/incident-events
+Content-Type: application/json
+
+{
+  "event":               "generate_summary",
+  "control_number":      "BLT-2026-00001",
+  "incident_category":   "Disturbance / Noise Complaint",
+  "incident_date":       "April 25, 2026",
+  "incident_location":   "Purok 1",
+  "incident_narrative":  "Loud music playing past midnight disturbing neighbors...",
+  "respondent_name":     "Respondent Name",
+  "witness_name":        "None",
+  "status":              "Mediation Scheduled",
+  "resolution_summary":  "Not yet recorded",
+  "staff_notes":         "Please arrive before the scheduled meeting",
+  "callback_url":        "https://&lt;REDACTED_PORTAL_HOST&gt;/api/n8n/incident-summary",
+  "callback_secret":     "&lt;REDACTED_SHARED_SECRET&gt;"
+}</code></pre>
+                </div>
+
+                <h3>Callback Response the Portal Expects</h3>
+                <div class="code-block">
+                    <pre><code>POST /api/n8n/incident-summary
+Content-Type: application/json
+
+{
+  "control_number":  "BLT-2026-00001",
+  "summary":         "On April 25, 2026, a noise complaint was filed...",
+  "callback_secret": "&lt;REDACTED_SHARED_SECRET&gt;"
+}
+
+# Success: {"status":"ok"}
+# Fail:    {"error":"Unauthorized"}  (secret mismatch)</code></pre>
+                </div>
+
+                <h3>Environment Variable Required</h3>
+                <div class="code-block">
+                    <pre><code># Laravel .env
+N8N_INCIDENT_WEBHOOK_URL=https://&lt;REDACTED_N8N_HOST&gt;/webhook/incident-events
+N8N_WEBHOOK_SECRET=&lt;REDACTED_SHARED_SECRET&gt;</code></pre>
+                </div>
+            </section>
+
+            <section id="workflow-n8n-backup" class="doc-section">
+                <h2>n8n Workflow — Database Backup to Dropbox</h2>
+                <p>
+                    This workflow automates daily database backups. When triggered — either by the Laravel scheduler
+                    at 02:00 daily or manually by an admin from the Maintenance page — it pulls a full SQL dump from
+                    the portal, compresses it, and uploads the ZIP archive to Dropbox for off-site storage.
+                </p>
+
+                <!-- Workflow screenshot -->
+                <figure class="workflow-screenshot">
+                    <img src="assets/n8n-backup-workflow.png"
+                         alt="n8n workflow editor showing three connected nodes: Webhook receives POST trigger, HTTP Request fetches the database dump ZIP from the portal API, Upload a file sends the ZIP to Dropbox under barangay-backups folder with a timestamped filename." />
+                </figure>
+
+                <!-- Node 1 -->
+                <h3><span class="node-num">1</span> Webhook — Trigger</h3>
+                <p>
+                    The entry point. Listens for an HTTP POST request on the <code>/webhook/db-backup</code> path.
+                    Laravel triggers this endpoint in two ways: the daily scheduler (<code>routes/console.php</code>)
+                    and the admin "Backup to Dropbox" button on the Maintenance page.
+                </p>
+                <div class="code-block">
+                    <pre><code>Node:     Webhook
+Method:   POST
+Path:     db-backup
+URL:      https://&lt;REDACTED_N8N_HOST&gt;/webhook/db-backup</code></pre>
+                </div>
+                <p class="muted">The webhook payload from Laravel includes a <code>source</code> field (<code>scheduled</code> or <code>admin_manual</code>) and a timestamp, but these are informational — the workflow proceeds the same regardless of trigger source.</p>
+
+                <!-- Node 2 -->
+                <h3><span class="node-num">2</span> HTTP Request — Fetch Database Dump</h3>
+                <p>
+                    Calls the portal's backup API endpoint to download a full SQL dump compressed as a ZIP file.
+                    The request includes the <code>X-Backup-Secret</code> header for authentication — without it,
+                    the endpoint returns 401 Unauthorized.
+                </p>
+                <div class="code-block">
+                    <pre><code>Node:     HTTP Request
+Method:   GET
+URL:      https://&lt;REDACTED_PORTAL_HOST&gt;/api/backup/database
+
+Headers:
+  X-Backup-Secret: {BACKUP_API_SECRET}
+
+Response Format: File (binary)
+Output: ZIP archive containing full SQL dump</code></pre>
+                </div>
+                <div class="note">
+                    The portal's <code>BackupDatabase</code> command generates a PDO-based SQL dump of all tables,
+                    compresses it into a ZIP archive, and streams it as the HTTP response. The dump includes
+                    structure and data for all application tables.
+                </div>
+
+                <!-- Node 3 -->
+                <h3><span class="node-num">3</span> Dropbox — Upload a File</h3>
+                <p>
+                    Takes the ZIP binary from the previous node and uploads it to a dedicated backup folder
+                    in Dropbox. The filename includes a timestamp to prevent overwrites and maintain a full
+                    backup history.
+                </p>
+                <div class="code-block">
+                    <pre><code>Node:       Dropbox — Upload a File
+Action:     Upload File
+Input:      Binary data from HTTP Request node
+
+Destination Path:
+  /barangay-backups/{{ $now.format('yyyy-MM-dd_HHmmss') }}-barangay-backup.zip
+
+Example output filename:
+  2026-04-28_020000-barangay-backup.zip</code></pre>
+                </div>
+                <p class="muted">
+                    The Dropbox node uses an OAuth2 credential configured in n8n's credential store.
+                    The <code>barangay-backups/</code> folder is created automatically on first upload if it doesn't exist.
+                </p>
+
+                <h3>Workflow Settings</h3>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Setting</th>
+                                <th>Value</th>
+                                <th>Purpose</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>Timezone</code></td><td>Asia/Manila</td><td>Ensures timestamp in filename matches local time</td></tr>
+                            <tr><td><code>Binary Mode</code></td><td>Separate</td><td>Handles ZIP binary data independently from JSON metadata</td></tr>
+                            <tr><td><code>Execution Order</code></td><td>v1 (sequential)</td><td>Nodes execute strictly in order — download completes before upload starts</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>Environment Variables Required</h3>
+                <div class="code-block">
+                    <pre><code># Laravel .env
+BACKUP_N8N_WEBHOOK_URL=https://&lt;REDACTED_N8N_HOST&gt;/webhook/db-backup
+BACKUP_API_SECRET=&lt;REDACTED_BACKUP_SECRET&gt;</code></pre>
+                </div>
+                <p class="muted">The <code>BACKUP_API_SECRET</code> value must match the <code>X-Backup-Secret</code> header configured in the n8n HTTP Request node. Both sides must agree on this shared secret.</p>
+            </section>
+
+            <section id="workflow-pusher" class="doc-section">
+                <h2>Pusher Workflow</h2>
+
+                <h3>How Notifications are Dispatched</h3>
+                <p>All notification delivery is centralized through <code>PortalRealtimeNotificationService</code>:</p>
+                <div class="code-block">
+                    <pre><code>// Notify a single user
+PortalRealtimeNotificationService::notifyUser(
+    userId: $user->id,
+    title: 'Document approved',
+    message: 'Your request DOC-2026-00012 has been approved.',
+    url: route('documents.index'),
+    level: 'success'   // success | warning | error | info
+);
+
+// Notify all admins
+PortalRealtimeNotificationService::notifyAdmins(
+    title: 'New incident report',
+    message: 'BLT-2026-00003 has been submitted.',
+    url: route('admin.incidents.index'),
+    level: 'info'
+);</code></pre>
+                </div>
+
+                <h3>Frontend Subscription (Laravel Echo)</h3>
+                <div class="code-block">
+                    <pre><code>// resources/js/app.js (Vite-bundled)
+import Echo from 'laravel-echo';
+import Pusher from 'pusher-js';
+
+window.Echo = new Echo({
+    broadcaster: 'pusher',
+    key: import.meta.env.VITE_PUSHER_APP_KEY,
+    cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER,
+    forceTLS: true,
+});
+
+// Subscribe to user's private channel
+window.Echo
+    .private(`portal.user.${userId}`)
+    .listen('PortalNotificationSent', (e) => {
+        // append notification to the UI
+    });</code></pre>
+                </div>
+
+                <h3>Switching to Laravel Reverb (Self-hosted)</h3>
+                <div class="code-block">
+                    <pre><code>BROADCAST_CONNECTION=reverb
+REVERB_APP_KEY=your-reverb-key
+REVERB_APP_SECRET=your-reverb-secret
+REVERB_APP_ID=your-reverb-id
+REVERB_HOST=&lt;REVERB_HOST&gt;
+REVERB_PORT=8080
+REVERB_SCHEME=http
+
+# Start the Reverb server:
+php artisan reverb:start</code></pre>
+                </div>
+                <p class="muted">No application code changes are needed — the broadcast driver is resolved from the environment at runtime.</p>
+            </section>
+
+            <section id="workflow-redis" class="doc-section">
+                <h2>Redis Workflow</h2>
+                <p>
+                    Redis is the low-latency infrastructure layer used by the portal for <strong>sessions</strong>,
+                    <strong>cache</strong>, and <strong>queues</strong>. It keeps dashboard reads fast, allows queued
+                    jobs to run asynchronously, and supports scalable multi-instance deployments.
+                </p>
+
+                <h3>How Redis Is Used in the Portal</h3>
+                <ul>
+                    <li><strong>Session store</strong> — authenticated session data is stored in Redis, not local files.</li>
+                    <li><strong>Application cache</strong> — frequently requested counters and aggregates are cached with short TTL.</li>
+                    <li><strong>Queue backend</strong> — async jobs (Zapier, n8n, notification-related tasks) are pushed to Redis queues.</li>
+                </ul>
+
+                <h3>Runtime Flow</h3>
+                <ol class="flow-steps">
+                    <li class="flow-step">
+                        <span class="step-num">1</span>
+                        <div><strong>User request enters Laravel</strong> — middleware reads session state from Redis.</div>
+                    </li>
+                    <li class="flow-step">
+                        <span class="step-num">2</span>
+                        <div><strong>Controller checks cached values</strong> — cache hit returns quickly; cache miss computes and stores value with TTL.</div>
+                    </li>
+                    <li class="flow-step">
+                        <span class="step-num">3</span>
+                        <div><strong>Async work is dispatched</strong> — jobs are pushed to Redis queues instead of blocking the HTTP response.</div>
+                    </li>
+                    <li class="flow-step">
+                        <span class="step-num">4</span>
+                        <div><strong>Queue workers consume jobs</strong> — <code>php artisan queue:work redis</code> processes webhook, email, and integration jobs.</div>
+                    </li>
+                    <li class="flow-step">
+                        <span class="step-num">5</span>
+                        <div><strong>Client gets fast response</strong> — heavy tasks continue in the background while user-facing request completes.</div>
+                    </li>
+                </ol>
+
+                <h3>Environment Configuration</h3>
+                <div class="code-block">
+                    <pre><code># Core Redis connection
+REDIS_HOST=&lt;REDIS_HOST&gt;
+REDIS_PORT=6379
+REDIS_PASSWORD=null
+
+# Use Redis for state and async workloads
+SESSION_DRIVER=redis
+CACHE_STORE=redis
+QUEUE_CONNECTION=redis</code></pre>
+                </div>
+
+                <h3>Local Verification Checklist</h3>
+                <div class="code-block">
+                    <pre><code># 1) Confirm Redis is reachable
+php artisan tinker
+>>> Illuminate\Support\Facades\Redis::ping()
+
+# 2) Clear stale state before test
+php artisan optimize:clear
+
+# 3) Start queue worker backed by Redis
+php artisan queue:work redis --tries=3 --sleep=1
+
+# 4) Trigger an action that dispatches a job
+#    (example: approve a document request or trigger backup webhook)
+
+# 5) Confirm queue worker logs job processing output</code></pre>
+                </div>
+
+                <div class="note">
+                    <strong>Production hardening:</strong> use a dedicated Redis instance, enable authentication and network restrictions,
+                    set memory policy intentionally (for example <code>allkeys-lru</code> for cache-heavy workloads),
+                    and consider Redis Sentinel/Cluster for high availability.
+                </div>
+            </section>
+
+            <section id="workflow-email" class="doc-section">
+                <h2>Email Workflow</h2>
+
+                <h3>Available Mail Templates</h3>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Mailable Class</th>
+                                <th>Trigger</th>
+                                <th>Recipient</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>ResidentVerifiedMail</code></td><td>Admin approves resident profile</td><td>Resident</td></tr>
+                            <tr><td><code>ResidentProfileSubmittedMail</code></td><td>Resident submits profile</td><td>Resident</td></tr>
+                            <tr><td><code>DocumentPaymentConfirmedMail</code></td><td>Stripe webhook confirmed</td><td>Resident</td></tr>
+                            <tr><td><code>DocumentApprovedMail</code></td><td>Zapier callback returns doc URL</td><td>Resident</td></tr>
+                            <tr><td><code>DocumentRejectedRefundMail</code></td><td>Admin rejects document</td><td>Resident</td></tr>
+                            <tr><td><code>IncidentReportSubmittedMail</code></td><td>Resident files new report</td><td>Resident</td></tr>
+                            <tr><td><code>IncidentAdminNewReportMail</code></td><td>Resident files new report</td><td>All Admins</td></tr>
+                            <tr><td><code>IncidentRespondentSummonsMail</code></td><td>Admin accepts for mediation</td><td>Respondent email</td></tr>
+                            <tr><td><code>IncidentMediationScheduledMail</code></td><td>Admin schedules mediation</td><td>Resident + Respondent</td></tr>
+                            <tr><td><code>IncidentPaymentRequiredMail</code></td><td>Outcome recorded — fee due</td><td>Resident</td></tr>
+                            <tr><td><code>IncidentPaymentConfirmedMail</code></td><td>Case fee paid</td><td>Resident</td></tr>
+                            <tr><td><code>IncidentCaseUpdateMail</code></td><td>Status changes</td><td>Resident</td></tr>
+                            <tr><td><code>EventRegistrationConfirmedMail</code></td><td>Free event registration</td><td>Resident</td></tr>
+                            <tr><td><code>EventPublishedMail</code></td><td>Admin publishes event</td><td>All verified residents</td></tr>
+                            <tr><td><code>EventCheckInConfirmedMail</code></td><td>QR check-in successful</td><td>Resident</td></tr>
+                            <tr><td><code>EventSystemNotificationMail</code></td><td>Event-level admin alerts</td><td>Admin</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>Local Development — Mailpit</h3>
+                <div class="code-block">
+                    <pre><code># Run Mailpit (captures all outgoing SMTP on port 2525)
+# macOS via Homebrew:
+brew install mailpit && mailpit
+
+# Windows via binary: https://mailpit.axllent.org/docs/install/
+
+# .env settings:
+MAIL_MAILER=smtp
+MAIL_HOST=&lt;LOCAL_SMTP_HOST&gt;
+MAIL_PORT=2525
+MAIL_FROM_ADDRESS=portal@example.invalid
+
+# View captured emails:
+&lt;LOCAL_MAILPIT_UI_URL&gt;</code></pre>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script src="app.js" defer></script>
+</body>
+
+</html>

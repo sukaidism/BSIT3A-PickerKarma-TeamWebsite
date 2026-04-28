@@ -1,439 +1,307 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PickerKarma — Barangay Management System</title>
+    <title>PickerKarma - Team Website</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
-        crossorigin="anonymous" referrerpolicy="no-referrer">
+    <link href="https://fonts.googleapis.com/css2?family=Calistoga&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
+    <link rel="stylesheet" href="app.css">
 </head>
-
-<body>
-
-    <header class="site-header">
+<body class="page-home">
+    <header class="site-header" id="siteHeader">
         <div class="container header-inner">
             <a class="brand" href="#home">PickerKarma</a>
-            <nav class="nav" aria-label="Main navigation">
+            <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation" aria-expanded="false" aria-controls="siteNav">
+                <i class="fa-solid fa-bars" aria-hidden="true"></i>
+            </button>
+            <nav class="nav" id="siteNav" aria-label="Main navigation">
                 <a class="nav-link" href="#home">Home</a>
                 <a class="nav-link" href="#team">Team</a>
                 <a class="nav-link" href="#project">Project</a>
-                <a class="nav-link" href="api-docs.html">API Docs</a>
                 <a class="nav-link" href="#video">Video</a>
                 <a class="nav-link" href="#updates">Updates</a>
+                <a class="nav-link" href="api-docs.html">API Docs</a>
             </nav>
         </div>
     </header>
 
     <main>
-
-        <!-- PickerKarma intro -->
-        <section id="home" class="hero">
-            <div class="container hero-layout">
-                <div class="hero-text-col">
-                    <div class="hero-badge">Team Name</div>
-                    <h1 class="hero-title">PickerKarma</h1>
-
-                    <div class="hero-divider" aria-hidden="true"></div>
-
-                    <div class="hero-lead">The Team Behind the System</div>
-                    <p class="hero-text">
-                        PickerKarma is a team of passionate BSIT students on a mission to craft digital solutions that
-                        are not only efficient and accessible but also truly meaningful. For us, outstanding technology
-                        is born from teamwork, a clear vision, and a united drive to create lasting change in the real
-                        world.
+        <section id="home" class="hero anchor">
+            <div class="container hero-grid">
+                <div class="reveal">
+                    <div class="section-label">
+                        <span class="label-dot pulsing-dot"></span>
+                        <span>Team Profile</span>
+                    </div>
+                    <h1 class="hero-title">Building systems with <span class="gradient-text">precision and purpose</span></h1>
+                    <p class="hero-copy">
+                        PickerKarma is a BSIT team focused on practical engineering, clean interfaces, and reliable integrations.
+                        Our main deliverable is a full Barangay Management System that helps residents and staff complete public
+                        transactions faster and with better traceability.
                     </p>
-                    <p class="hero-text">
-                        Working side by side, we brought the <strong>Barangay Management System</strong> to life. A
-                        project that showcases our combined talents in system design, development, documentation, and
-                        seamless project coordination.
-                    </p>
-
                     <div class="hero-actions">
-                        <a class="btn btn-primary" href="#team">Meet the Team</a>
-                        <a class="btn btn-ghost" href="#project">Our Project</a>
+                        <a class="btn btn-primary" href="#team">Meet the Team <i class="fa-solid fa-arrow-right"></i></a>
+                        <a class="btn btn-outline" href="#project">View the Project</a>
                         <a class="btn btn-ghost" href="api-docs.html">API Documentation</a>
                     </div>
+                    <div class="hero-stats">
+                        <article class="stat-card">
+                            <p class="stat-number">5</p>
+                            <p class="stat-label">Team Members</p>
+                        </article>
+                        <article class="stat-card">
+                            <p class="stat-number">1</p>
+                            <p class="stat-label">System Delivered</p>
+                        </article>
+                        <article class="stat-card">
+                            <p class="stat-number">BSIT</p>
+                            <p class="stat-label">Program</p>
+                        </article>
+                        <article class="stat-card">
+                            <p class="stat-number">3A</p>
+                            <p class="stat-label">Section</p>
+                        </article>
+                    </div>
                 </div>
 
-                <div class="hero-stats-col">
-                    <div class="hero-stat-card">
-                        <div class="hero-stat-num">5</div>
-                        <div class="hero-stat-label">Team Members</div>
-                    </div>
-                    <div class="hero-stat-card">
-                        <div class="hero-stat-num">1</div>
-                        <div class="hero-stat-label">Project</div>
-                    </div>
-                    <div class="hero-stat-card">
-                        <div class="hero-stat-num">BSIT</div>
-                        <div class="hero-stat-label">Degree Program</div>
-                    </div>
-                    <div class="hero-stat-card">
-                        <div class="hero-stat-num">3A</div>
-                        <div class="hero-stat-label">Section</div>
-                    </div>
+                <div class="hero-visual reveal" aria-hidden="true">
+                    <div class="ring"></div>
+                    <div class="orb"></div>
+                    <article class="floating-card float-a">
+                        <p class="floating-title">Realtime Alerts</p>
+                        <p class="floating-text">Notifications and status updates</p>
+                    </article>
+                    <article class="floating-card float-b">
+                        <p class="floating-title">API First</p>
+                        <p class="floating-text">Sanctum + OpenAPI workflow</p>
+                    </article>
+                    <article class="floating-card float-c">
+                        <p class="floating-title">Resident Services</p>
+                        <p class="floating-text">Events, incidents, and documents</p>
+                    </article>
                 </div>
             </div>
         </section>
 
-        <!-- ② OUR TEAM — Member Cards -->
-        <section id="team" class="team-block anchor">
-            <div class="container team-block-inner">
-                <h2 class="team-title">Our Team</h2>
-                <p class="team-subtitle">
-                    Meet the people of PickerKarma.
-                </p>
+        <section id="team" class="team-section dark-section anchor">
+            <div class="container">
+                <div class="section-head reveal">
+                    <div class="section-label">
+                        <span class="label-dot"></span>
+                        <span>Our Team</span>
+                    </div>
+                    <h2>People behind <span class="gradient-text">PickerKarma</span></h2>
+                    <p>Each member owns a distinct discipline, but we build and ship as one engineering unit.</p>
+                </div>
 
                 <div class="team-grid">
-                    <article class="team-card">
-                        <img class="team-photo" src="assets\IMG_2809.jpg" alt="Paul Richard G. Calma">
+                    <article class="team-card reveal">
+                        <img class="team-photo" src="assets/IMG_2809.jpg" alt="Paul Richard G. Calma">
                         <div class="team-meta">
-                            <div class="team-role">PROJECT COORDINATOR</div>
-                            <h3 class="team-name">Paul Richard G. Calma</h3>
-                            <p class="team-desc">Paul guides the team with a steady hand, keeping the project on track
-                                and tasks well-coordinated. He champions clear communication and ensures the system
-                                meets its goals.</p>
+                            <p class="team-role">Project Coordinator</p>
+                            <h3>Paul Richard G. Calma</h3>
+                            <p>Leads delivery planning, scope alignment, and team coordination across project milestones.</p>
                         </div>
-                        <div class="team-social" aria-label="LinkedIn link">
-                            <a href="https://www.linkedin.com/in/paul-richard-calma-106516280/" class="social-link"
-                                aria-label="LinkedIn">
-                                <i class="fa-brands fa-linkedin-in" aria-hidden="true"></i>
-                            </a>
-                        </div>
+                        <a class="social-link" href="https://www.linkedin.com/in/paul-richard-calma-106516280/" aria-label="LinkedIn profile of Paul Richard G. Calma">
+                            <i class="fa-brands fa-linkedin-in" aria-hidden="true"></i>
+                        </a>
                     </article>
 
-                    <article class="team-card">
-                        <img class="team-photo" src="assets\848d51dc-2d52-466f-a133-e1cafc0bf929.jpg"
-                            alt="Emill Robin M. Echate">
+                    <article class="team-card reveal">
+                        <img class="team-photo" src="assets/848d51dc-2d52-466f-a133-e1cafc0bf929.jpg" alt="Emill Robin M. Echate">
                         <div class="team-meta">
-                            <div class="team-role">DOCUMENT SPECIALIST</div>
-                            <h3 class="team-name">Emill Robin M. Echate</h3>
-                            <p class="team-desc">Emill curates the project's story, preparing clear documentation,
-                                detailed reports, and polished presentations. He keeps every proposal and update
-                                organized and professional.</p>
+                            <p class="team-role">Documentation Specialist</p>
+                            <h3>Emill Robin M. Echate</h3>
+                            <p>Maintains technical documentation, artifacts, and structured project communication.</p>
                         </div>
-                        <div class="team-social" aria-label="LinkedIn link">
-                            <a href="https://www.linkedin.com/in/emill-robin-echate-a966a9378" class="social-link"
-                                aria-label="LinkedIn">
-                                <i class="fa-brands fa-linkedin-in" aria-hidden="true"></i>
-                            </a>
-                        </div>
+                        <a class="social-link" href="https://www.linkedin.com/in/emill-robin-echate-a966a9378" aria-label="LinkedIn profile of Emill Robin M. Echate">
+                            <i class="fa-brands fa-linkedin-in" aria-hidden="true"></i>
+                        </a>
                     </article>
 
-                    <article class="team-card">
-                        <img class="team-photo" src="assets\1771914743929.jpg" alt="Thaffeia Mharei T. Haavik">
+                    <article class="team-card reveal">
+                        <img class="team-photo" src="assets/1771914743929.jpg" alt="Thaffeia Mharei T. Haavik">
                         <div class="team-meta">
-                            <div class="team-role">INTEGRATION SPECIALIST / TESTER</div>
-                            <h3 class="team-name">Thaffeia Mharei T. Haavik</h3>
-                            <p class="team-desc">Thaffeia brings all the pieces together, rigorously testing for errors
-                                and performance issues. She ensures every feature works flawlessly before the system
-                                goes live.</p>
+                            <p class="team-role">Integration Specialist / Tester</p>
+                            <h3>Thaffeia Mharei T. Haavik</h3>
+                            <p>Handles test validation, workflow integration checks, and release quality confidence.</p>
                         </div>
-                        <div class="team-social" aria-label="LinkedIn link">
-                            <a href="https://www.linkedin.com/in/thaffeia-mharei-haavik-644126378/" class="social-link"
-                                aria-label="LinkedIn">
-                                <i class="fa-brands fa-linkedin-in" aria-hidden="true"></i>
-                            </a>
-                        </div>
+                        <a class="social-link" href="https://www.linkedin.com/in/thaffeia-mharei-haavik-644126378/" aria-label="LinkedIn profile of Thaffeia Mharei T. Haavik">
+                            <i class="fa-brands fa-linkedin-in" aria-hidden="true"></i>
+                        </a>
                     </article>
 
-                    <article class="team-card">
-                        <img class="team-photo" src="assets\9a53b880-c4ac-4d8d-8922-d111a23d53e0.jpg"
-                            alt="Sean Gabriel S. Santos">
+                    <article class="team-card reveal">
+                        <img class="team-photo" src="assets/9a53b880-c4ac-4d8d-8922-d111a23d53e0.jpg" alt="Sean Gabriel S. Santos">
                         <div class="team-meta">
-                            <div class="team-role">BACKEND DEVELOPER</div>
-                            <h3 class="team-name">Sean Gabriel S. Santos</h3>
-                            <p class="team-desc">Sean powers the heart of the Barangay Management System, expertly
-                                managing databases and system logic. He ensures data flows securely and efficiently
-                                behind the scenes.</p>
+                            <p class="team-role">Backend Developer</p>
+                            <h3>Sean Gabriel S. Santos</h3>
+                            <p>Builds core service logic, data models, and API endpoints that power the platform.</p>
                         </div>
-                        <div class="team-social" aria-label="LinkedIn link">
-                            <a href="https://www.linkedin.com/in/sean-gabriel-santos-039b31377/" class="social-link"
-                                aria-label="LinkedIn">
-                                <i class="fa-brands fa-linkedin-in" aria-hidden="true"></i>
-                            </a>
-                        </div>
+                        <a class="social-link" href="https://www.linkedin.com/in/sean-gabriel-santos-039b31377/" aria-label="LinkedIn profile of Sean Gabriel S. Santos">
+                            <i class="fa-brands fa-linkedin-in" aria-hidden="true"></i>
+                        </a>
                     </article>
 
-                    <article class="team-card">
-                        <img class="team-photo" src="assets\6cbefebb-29b0-4d14-a550-cc763c98fbdc.jpg"
-                            alt="Gabriele D. Tabing">
+                    <article class="team-card reveal">
+                        <img class="team-photo" src="assets/6cbefebb-29b0-4d14-a550-cc763c98fbdc.jpg" alt="Gabriele D. Tabing">
                         <div class="team-meta">
-                            <div class="team-role">FRONTEND DEVELOPER / UI DESIGNER</div>
-                            <h3 class="team-name">Gabriele D. Tabing</h3>
-                            <p class="team-desc">Gabriele crafts the user interface, creating a seamless, inviting
-                                experience. He makes sure every page and module is clear, accessible, and a pleasure to
-                                use.</p>
+                            <p class="team-role">Frontend Developer / UI Designer</p>
+                            <h3>Gabriele D. Tabing</h3>
+                            <p>Designs and implements responsive, accessible interfaces for staff and resident portals.</p>
                         </div>
-                        <div class="team-social" aria-label="LinkedIn link">
-                            <a href="https://www.linkedin.com/in/gabriele-tabing-5a991a358/" class="social-link"
-                                aria-label="LinkedIn">
-                                <i class="fa-brands fa-linkedin-in" aria-hidden="true"></i>
-                            </a>
-                        </div>
+                        <a class="social-link" href="https://www.linkedin.com/in/gabriele-tabing-5a991a358/" aria-label="LinkedIn profile of Gabriele D. Tabing">
+                            <i class="fa-brands fa-linkedin-in" aria-hidden="true"></i>
+                        </a>
                     </article>
                 </div>
             </div>
         </section>
 
-        <!-- OUR PROJECT — Barangay Management System -->
-        <section id="project" class="project-block anchor">
-            <div class="container project-layout">
-                <div class="project-text-col">
-                    <div class="project-eyebrow">Project Title</div>
-                    <h2 class="project-title">Barangay Management System</h2>
-
-                    <div class="project-divider" aria-hidden="true"></div>
-
-                    <div class="project-lead">Project Description</div>
-                    <p class="project-text">
-                        The Barangay Management System provides a modern digital solution that streamlines how barangay
-                        offices manage records, services, and transactions. By consolidating processes into a single,
-                        organized platform, the system reduces paperwork, minimizes the risk of lost files, and enables
-                        faster, more efficient service for residents.
-                    </p>
-                    <p class="project-text">
-                        The project aims to make barangay services faster, more accurate, and easier to access. Staff
-                        can efficiently manage resident information, issue documents, track requests, and maintain
-                        records with greater confidence and reliability.
-                    </p>
-                    <p class="project-text">
-                        This system serves barangay staff, officials, and residents seeking quicker and more convenient
-                        public service transactions.
-                    </p>
+        <section id="project" class="project-section anchor">
+            <div class="container">
+                <div class="project-grid">
+                    <div class="project-copy reveal">
+                        <div class="section-label">
+                            <span class="label-dot"></span>
+                            <span>Project Overview</span>
+                        </div>
+                        <h2>Barangay Management System</h2>
+                        <p>
+                            The system centralizes resident management, service requests, community events, and reporting into
+                            one operational platform. It reduces manual paperwork and helps barangay staff process requests with
+                            predictable workflows.
+                        </p>
+                        <p>
+                            Our implementation includes resident and admin modules, API integrations, payment workflow support,
+                            and notification channels designed for real deployment scenarios.
+                        </p>
+                    </div>
+                    <aside class="project-panel reveal">
+                        <h3>System Stack Snapshot</h3>
+                        <ul>
+                            <li><span>Backend</span><strong>Laravel + Sanctum</strong></li>
+                            <li><span>Realtime</span><strong>Pusher / Echo</strong></li>
+                            <li><span>Payments</span><strong>Stripe</strong></li>
+                            <li><span>Email</span><strong>Mailtrap</strong></li>
+                            <li><span>API Docs</span><strong>OpenAPI 3</strong></li>
+                        </ul>
+                    </aside>
                 </div>
 
-                <div class="project-visual" aria-hidden="true">
-                    <div class="project-visual-bg"></div>
-                    <div class="project-visual-card">
-                        <div class="project-visual-lines">
-                            <span></span><span></span><span></span>
-                        </div>
-                        <div class="project-visual-chip">Barangay Records</div>
+                <div class="section-head reveal">
+                    <div class="section-label">
+                        <span class="label-dot"></span>
+                        <span>Core Modules</span>
                     </div>
-                </div>
-            </div>
-
-            <!-- KEY FEATURES -->
-            <div class="container features-wrap">
-                <div class="features-header">
-                    <div class="project-eyebrow">What It Can Do</div>
-                    <h3 class="features-title">Key Features &amp; Functionalities</h3>
+                    <h2>Key Features and Functionalities</h2>
                 </div>
 
-                <div class="features-grid">
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <svg viewBox="0 0 24 24" aria-hidden="true">
-                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-                                <circle cx="9" cy="7" r="4" />
-                                <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-                                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-                            </svg>
-                        </div>
-                        <h4 class="feature-name">Resident Record Management</h4>
-                        <p class="feature-desc">Store and manage resident profiles, household information, and
-                            demographic details.</p>
-                    </div>
-
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <svg viewBox="0 0 24 24" aria-hidden="true">
-                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                                <polyline points="14 2 14 8 20 8" />
-                                <line x1="16" y1="13" x2="8" y2="13" />
-                                <line x1="16" y1="17" x2="8" y2="17" />
-                                <polyline points="10 9 9 9 8 9" />
-                            </svg>
-                        </div>
-                        <h4 class="feature-name">Certificate &amp; Document Issuance</h4>
-                        <p class="feature-desc">Generate barangay clearance, certificate of residency, indigency
-                            certificate, and other official forms.</p>
-                    </div>
-
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <svg viewBox="0 0 24 24" aria-hidden="true">
-                                <circle cx="12" cy="12" r="10" />
-                                <polyline points="12 6 12 12 16 14" />
-                            </svg>
-                        </div>
-                        <h4 class="feature-name">Request Tracking</h4>
-                        <p class="feature-desc">Monitor the status of resident requests and document processing in real
-                            time.</p>
-                    </div>
-
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <svg viewBox="0 0 24 24" aria-hidden="true">
-                                <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z" />
-                                <polyline points="13 2 13 9 20 9" />
-                            </svg>
-                        </div>
-                        <h4 class="feature-name">Blotter &amp; Incident Recording</h4>
-                        <p class="feature-desc">Keep records of complaints, incidents, and barangay blotter reports.</p>
-                    </div>
-
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <svg viewBox="0 0 24 24" aria-hidden="true">
-                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-                                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-                            </svg>
-                        </div>
-                        <h4 class="feature-name">User Account Management</h4>
-                        <p class="feature-desc">Secure login access for administrators and authorized barangay
-                            personnel.</p>
-                    </div>
-
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <svg viewBox="0 0 24 24" aria-hidden="true">
-                                <circle cx="11" cy="11" r="8" />
-                                <line x1="21" y1="21" x2="16.65" y2="16.65" />
-                            </svg>
-                        </div>
-                        <h4 class="feature-name">Search &amp; Filter Functions</h4>
-                        <p class="feature-desc">Quickly locate resident records, requests, and reports with powerful
-                            filters.</p>
-                    </div>
-
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <svg viewBox="0 0 24 24" aria-hidden="true">
-                                <line x1="18" y1="20" x2="18" y2="10" />
-                                <line x1="12" y1="20" x2="12" y2="4" />
-                                <line x1="6" y1="20" x2="6" y2="14" />
-                            </svg>
-                        </div>
-                        <h4 class="feature-name">Report Generation</h4>
-                        <p class="feature-desc">Produce organized reports for barangay activities, resident statistics,
-                            and transaction history.</p>
-                    </div>
-
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <svg viewBox="0 0 24 24" aria-hidden="true">
-                                <rect x="3" y="3" width="7" height="7" />
-                                <rect x="14" y="3" width="7" height="7" />
-                                <rect x="14" y="14" width="7" height="7" />
-                                <rect x="3" y="14" width="7" height="7" />
-                            </svg>
-                        </div>
-                        <h4 class="feature-name">Dashboard Overview</h4>
-                        <p class="feature-desc">Display summaries of recent requests, issued documents, and barangay
-                            activities at a glance.</p>
-                    </div>
+                <div class="feature-grid">
+                    <article class="feature-card reveal">
+                        <div class="feature-icon"><i class="fa-solid fa-users"></i></div>
+                        <h3>Resident Record Management</h3>
+                        <p>Maintain resident profiles, household details, and searchable demographics.</p>
+                    </article>
+                    <article class="feature-card reveal">
+                        <div class="feature-icon"><i class="fa-solid fa-file-signature"></i></div>
+                        <h3>Document Issuance</h3>
+                        <p>Request and process barangay certificates with status tracking and approvals.</p>
+                    </article>
+                    <article class="feature-card reveal">
+                        <div class="feature-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                        <h3>Incident Management</h3>
+                        <p>File, review, and resolve incident reports with structured workflows.</p>
+                    </article>
+                    <article class="feature-card reveal">
+                        <div class="feature-icon"><i class="fa-solid fa-calendar-check"></i></div>
+                        <h3>Community Events</h3>
+                        <p>Publish events, register residents, process payments, and check in via QR.</p>
+                    </article>
+                    <article class="feature-card reveal">
+                        <div class="feature-icon"><i class="fa-solid fa-bell"></i></div>
+                        <h3>Notifications</h3>
+                        <p>Deliver realtime and persisted notifications for key resident/admin actions.</p>
+                    </article>
+                    <article class="feature-card reveal">
+                        <div class="feature-icon"><i class="fa-solid fa-chart-line"></i></div>
+                        <h3>Operational Reporting</h3>
+                        <p>Provide summary dashboards and data views for barangay decision support.</p>
+                    </article>
                 </div>
             </div>
         </section>
 
-        <!-- EXPLAINER VIDEO -->
-        <section id="video" class="video-block anchor">
-            <div class="container video-block-inner">
-                <div class="video-eyebrow">Watch the Explainer</div>
-                <h2 class="video-title">See PickerKarma in Action</h2>
-                <p class="video-subtitle">
-                    Watch our final explainer video where we break down the core concepts of System Integration and
-                    Architecture
-                    - covering how systems communicate, integrate, and work together as a unified whole.
-                </p>
-
-                <div class="video-wrapper" id="videoWrapper">
-                    <iframe class="video-player" src="https://www.youtube.com/embed/aYRytyuGjwA?rel=0&modestbranding=1"
-                        title="PickerKarma — System Integration and Architecture Final Explainer Video"
+        <section id="video" class="video-section dark-section anchor">
+            <div class="container">
+                <div class="section-head reveal centered">
+                    <div class="section-label">
+                        <span class="label-dot pulsing-dot"></span>
+                        <span>Presentation</span>
+                    </div>
+                    <h2>System Integration and Architecture Explainer</h2>
+                    <p>Short walkthrough of how the modules communicate and operate as a unified platform.</p>
+                </div>
+                <div class="video-frame reveal">
+                    <iframe src="https://www.youtube.com/embed/aYRytyuGjwA?rel=0&modestbranding=1"
+                        title="PickerKarma System Integration and Architecture Final Explainer Video"
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                         allowfullscreen></iframe>
                 </div>
-
-                <div class="video-caption">
-                    <span class="video-caption-dot" aria-hidden="true"></span>
-                    PickerKarma &mdash; System Integration and Architecture
-                </div>
             </div>
         </section>
 
-        <!-- PROJECT UPDATES TIMELINE -->
-        <section id="updates" class="updates-block anchor">
-            <div class="container updates-inner">
-                <div class="updates-header">
-                    <div class="project-eyebrow">Progress Log</div>
-                    <h2 class="updates-title">Project Updates</h2>
-                    <p class="updates-subtitle">Weekly updates and major milestones accomplished throughout the project.
-                    </p>
+        <section id="updates" class="updates-section anchor">
+            <div class="container">
+                <div class="section-head reveal">
+                    <div class="section-label">
+                        <span class="label-dot"></span>
+                        <span>Progress Log</span>
+                    </div>
+                    <h2>Project Updates</h2>
+                    <p>Current delivery milestones and implementation checkpoints.</p>
                 </div>
 
-                <div class="timeline">
-
-                    <div class="tl-item tl-left">
-                        <div class="tl-dot"><i class="fa-solid fa-flag" aria-hidden="true"></i></div>
-                        <div class="tl-card">
-                            <div class="tl-meta">
-                                <span class="tl-badge tl-milestone">Project Kickoff</span>
-                                <span class="tl-date">Week 1</span>
-                            </div>
-                            <h4 class="tl-title">Project Kickoff</h4>
-                            <p class="tl-desc">Formed the team, assigned roles, and held an initial planning meeting.
-                            </p>
-                        </div>
-                    </div>
-
-                    <div class="tl-item tl-right">
-                        <div class="tl-dot"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i></div>
-                        <div class="tl-card">
-                            <div class="tl-meta">
-                                <span class="tl-badge tl-update">Update</span>
-                                <span class="tl-date">Week 2</span>
-                            </div>
-                            <h4 class="tl-title">BPMN Diagram</h4>
-                            <p class="tl-desc">Created a BPMN diagram to visualize the processes and workflows involved
-                                in the Barangay Management System.</p>
-                            <a href="#" target="_blank" rel="noopener noreferrer" class="tl-btn">
-                                <i class="fa-solid fa-diagram-project" aria-hidden="true"></i>
-                                View BPMN Diagram
-                            </a>
-                        </div>
-                    </div>
-
-                </div>
-
-                <!-- WORK IN PROGRESS STATE -->
-                <div class="wip-wrap">
-                    <div class="wip-spine-cap" aria-hidden="true"></div>
-                    <div class="wip-badge">
-                        <span class="wip-pulse" aria-hidden="true"></span>
-                        Work in Progress
-                    </div>
-                    <p class="wip-note">This project is actively being developed. More updates coming soon.</p>
+                <div class="update-grid">
+                    <article class="update-card reveal">
+                        <p class="update-meta">Week 1 - Kickoff</p>
+                        <h3>Initial Planning and Role Assignment</h3>
+                        <p>Team structure, scope boundaries, and sprint responsibilities were finalized.</p>
+                    </article>
+                    <article class="update-card reveal featured-update">
+                        <p class="update-meta">Week 2 - Analysis</p>
+                        <h3>BPMN Workflow Modeling</h3>
+                        <p>Core operational workflows were mapped to guide module boundaries and API design.</p>
+                        <a class="mini-link" href="#">View BPMN Diagram <i class="fa-solid fa-arrow-right"></i></a>
+                    </article>
+                    <article class="update-card reveal">
+                        <p class="update-meta">Current - Active Sprint</p>
+                        <h3>Feature Hardening and Integration Testing</h3>
+                        <p>Ongoing stabilization of API, notifications, and resident-facing transaction flows.</p>
+                    </article>
                 </div>
             </div>
         </section>
-
     </main>
 
     <footer class="site-footer">
         <div class="container footer-inner">
-            <span class="footer-brand">PickerKarma</span>
-            <span class="footer-copy">©
-                <?php echo date('Y'); ?> · Barangay Management System · BSIT 3A
-            </span>
+            <p class="footer-brand">PickerKarma</p>
+            <p class="footer-copy">(c) 2026 Barangay Management System - BSIT 3A</p>
             <nav class="footer-nav" aria-label="Footer navigation">
                 <a href="#home">Home</a>
-                <a href="#team">Our Team</a>
-                <a href="#project">Our Project</a>
-                <a href="api-docs.html">API Docs</a>
+                <a href="#team">Team</a>
+                <a href="#project">Project</a>
                 <a href="#video">Video</a>
                 <a href="#updates">Updates</a>
+                <a href="api-docs.html">API Docs</a>
             </nav>
         </div>
     </footer>
 
-    <script src="script.js" defer></script>
+    <script src="app.js" defer></script>
 </body>
-
 </html>

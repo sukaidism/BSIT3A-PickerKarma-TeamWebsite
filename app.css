@@ -1,0 +1,10 @@
+@import url("./integration-guidelines.css");
+@import url("./style.css");
+
+body.page-home {
+    overflow-x: hidden;
+}
+
+body.page-docs {
+    overflow-x: hidden;
+}

@@ -7,13 +7,13 @@
     <title>PickerKarma API Documentation</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Calistoga&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
         crossorigin="anonymous" referrerpolicy="no-referrer">
-    <link rel="stylesheet" href="api-docs.css">
+    <link rel="stylesheet" href="app.css">
 </head>
 
-<body>
+<body class="page-docs">
     <header class="docs-topbar">
         <div class="docs-wrap topbar-inner">
             <a href="index.html" class="brand">PickerKarma</a>
@@ -47,7 +47,10 @@
 
         <main class="docs-content">
             <section id="overview" class="doc-section">
-                <p class="eyebrow">API Documentation</p>
+                <div class="section-label">
+                    <span class="label-dot pulsing-dot"></span>
+                    <span>API Documentation</span>
+                </div>
                 <h1>Barangay Management System API v1</h1>
                 <p>
                     This documentation covers the REST API used by the PickerKarma Barangay Management System. The API
@@ -56,6 +59,9 @@
                 <div class="note">
                     <strong>Audience:</strong> frontend developers, mobile app developers, QA testers, and system
                     integrators.
+                </div>
+                <div class="note">
+                    <strong>Security note:</strong> all credentials, tokens, secrets, callback URLs, and personal identifiers in this document are sanitized examples only.
                 </div>
             </section>
 
@@ -186,14 +192,14 @@ Authorization: Bearer {token}</code></pre>
                     <div class="code-block">
                         <pre><code>{
   "email": "resident@example.com",
-  "password": "your-password",
+  "password": "&lt;REDACTED_PASSWORD&gt;",
   "device_name": "web-client"
 }</code></pre>
                     </div>
                     <h4>Response</h4>
                     <div class="code-block">
                         <pre><code>{
-  "token": "1|token-value",
+  "token": "&lt;REDACTED_ACCESS_TOKEN&gt;",
   "token_type": "Bearer",
   "user": { "id": 3, "name": "Juan Dela Cruz", "role": "resident" }
 }</code></pre>
@@ -523,7 +529,7 @@ Authorization: Bearer {token}</code></pre>
                 <h3>Pre-check Before Running API Tests</h3>
                 <ul>
                     <li>Backend server running (Laravel via XAMPP/Apache or <code>php artisan serve</code>).</li>
-                    <li>Public URL active (ngrok) if testing outside local machine.</li>
+                    <li>Public URL tunnel active (for remote tests) using a sanitized demo domain.</li>
                     <li>Seeded users available (<code>AdminAndResidentsSeeder</code>) for resident/admin credentials.</li>
                     <li><code>Accept: application/json</code> is always included in request headers.</li>
                 </ul>
@@ -542,12 +548,12 @@ Expected keys: token, token_type, user</code></pre>
                 </div>
                 <div class="code-block">
                     <pre><code>{
-  "token": "1|sanctum-token",
+  "token": "&lt;REDACTED_ACCESS_TOKEN&gt;",
   "token_type": "Bearer",
   "user": {
     "id": 7,
     "name": "Resident 07",
-    "email": "resident1@example.com",
+    "email": "resident@example.invalid",
     "role": "resident"
   }
 }</code></pre>
@@ -605,8 +611,8 @@ Expected: 403 Forbidden</code></pre>
   -H "Accept: application/json" \
   -H "Content-Type: application/json" \
   -d '{
-    "email": "resident1@example.com",
-    "password": "helloworld123",
+    "email": "resident@example.invalid",
+    "password": "&lt;REDACTED_PASSWORD&gt;",
     "device_name": "demo-client"
   }'</code></pre>
                 </div>
@@ -615,14 +621,14 @@ Expected: 403 Forbidden</code></pre>
                 <div class="code-block">
                     <pre><code>curl -X GET "https://your-domain.com/api/v1/auth/me" \
   -H "Accept: application/json" \
-  -H "Authorization: Bearer YOUR_TOKEN_HERE"</code></pre>
+  -H "Authorization: Bearer &lt;REDACTED_ACCESS_TOKEN&gt;"</code></pre>
                 </div>
 
                 <h4>List Events (GET)</h4>
                 <div class="code-block">
                     <pre><code>curl -X GET "https://your-domain.com/api/v1/events" \
   -H "Accept: application/json" \
-  -H "Authorization: Bearer YOUR_TOKEN_HERE"</code></pre>
+  -H "Authorization: Bearer &lt;REDACTED_ACCESS_TOKEN&gt;"</code></pre>
                 </div>
 
                 <h4>Create Incident</h4>
@@ -630,12 +636,12 @@ Expected: 403 Forbidden</code></pre>
                     <pre><code>curl -X POST "https://your-domain.com/api/v1/incidents" \
   -H "Accept: application/json" \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer YOUR_TOKEN_HERE" \
+  -H "Authorization: Bearer &lt;REDACTED_ACCESS_TOKEN&gt;" \
   -d '{
     "category": "Noise Complaint",
     "description": "Loud music after curfew.",
     "incident_date": "2026-04-28",
-    "respondent_email": "neighbor@example.com"
+    "respondent_email": "respondent@example.invalid"
   }'</code></pre>
                 </div>
 
@@ -678,7 +684,7 @@ Expected: 403 Forbidden</code></pre>
         </main>
     </div>
 
-    <script src="api-docs.js" defer></script>
+    <script src="app.js" defer></script>
 </body>
 
 </html>
