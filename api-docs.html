@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PickerKarma API Documentation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+        crossorigin="anonymous" referrerpolicy="no-referrer">
+    <link rel="stylesheet" href="api-docs.css">
+</head>
+
+<body>
+    <header class="docs-topbar">
+        <div class="docs-wrap topbar-inner">
+            <a href="index.html" class="brand">PickerKarma</a>
+            <div class="topbar-actions">
+                <a href="index.html#project" class="btn btn-ghost">Back to Project</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="docs-wrap docs-layout">
+        <aside class="docs-sidebar" aria-label="Documentation sections">
+            <h2 class="sidebar-title">API Docs</h2>
+            <nav>
+                <a class="side-link" href="#overview">Overview</a>
+                <a class="side-link" href="#base-url">Base URL</a>
+                <a class="side-link" href="#auth">Authentication</a>
+                <a class="side-link" href="#formats">Request and Response Format</a>
+                <a class="side-link" href="#errors">Error Codes</a>
+                <a class="side-link" href="#auth-endpoints">Auth Endpoints</a>
+                <a class="side-link" href="#resident-events">Resident Event Endpoints</a>
+                <a class="side-link" href="#resident-incidents">Resident Incident Endpoints</a>
+                <a class="side-link" href="#resident-documents">Resident Document Endpoints</a>
+                <a class="side-link" href="#notifications">Notification Endpoints</a>
+                <a class="side-link" href="#admin-events">Admin Event Endpoints</a>
+                <a class="side-link" href="#admin-incidents">Admin Incident Endpoints</a>
+                <a class="side-link" href="#admin-documents">Admin Document Endpoints</a>
+                <a class="side-link" href="#openapi">OpenAPI Specification</a>
+                <a class="side-link" href="#testing-demonstration">Testing and Demonstration</a>
+            </nav>
+        </aside>
+
+        <main class="docs-content">
+            <section id="overview" class="doc-section">
+                <p class="eyebrow">API Documentation</p>
+                <h1>Barangay Management System API v1</h1>
+                <p>
+                    This documentation covers the REST API used by the PickerKarma Barangay Management System. The API
+                    provides token-based authentication, resident-facing services, and admin-only management endpoints.
+                </p>
+                <div class="note">
+                    <strong>Audience:</strong> frontend developers, mobile app developers, QA testers, and system
+                    integrators.
+                </div>
+            </section>
+
+            <section id="base-url" class="doc-section">
+                <h2>Base URL</h2>
+                <div class="code-row">
+                    <code>https://your-domain.com/api/v1</code>
+                    <button class="copy-btn" data-copy="https://your-domain.com/api/v1">Copy</button>
+                </div>
+                <p class="muted">
+                    Local development example: <code>http://127.0.0.1:8000/api/v1</code>
+                </p>
+            </section>
+
+            <section id="auth" class="doc-section">
+                <h2>Authentication Mechanism</h2>
+                <p>
+                    The API uses <strong>Laravel Sanctum Personal Access Tokens</strong> with Bearer authentication.
+                    Log in through <code>/auth/login</code> to receive a token, then send it in the Authorization
+                    header.
+                </p>
+                <div class="code-block">
+                    <pre><code>Authorization: Bearer {token}</code></pre>
+                </div>
+                <ul>
+                    <li><code>auth:sanctum</code> protects authenticated routes.</li>
+                    <li><code>resident.verified</code> ensures resident accounts are fully verified.</li>
+                    <li><code>admin</code> middleware limits admin modules to admin users only.</li>
+                </ul>
+            </section>
+
+            <section id="formats" class="doc-section">
+                <h2>Request and Response Format</h2>
+                <h3>Standard Request Headers</h3>
+                <div class="code-block">
+                    <pre><code>Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {token}</code></pre>
+                </div>
+
+                <h3>Request Body Example</h3>
+                <div class="code-block">
+                    <pre><code>{
+  "title": "Barangay Clean-up Drive",
+  "description": "Community event for all residents.",
+  "starts_at": "2026-05-15T08:00:00+08:00",
+  "ends_at": "2026-05-15T12:00:00+08:00",
+  "is_paid": true,
+  "registration_fee": 100
+}</code></pre>
+                </div>
+
+                <h3>Success Response Example</h3>
+                <div class="code-block">
+                    <pre><code>{
+  "message": "Event created successfully.",
+  "event": {
+    "id": 12,
+    "title": "Barangay Clean-up Drive",
+    "is_live_now": false
+  }
+}</code></pre>
+                </div>
+            </section>
+
+            <section id="errors" class="doc-section">
+                <h2>Error Codes</h2>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Status</th>
+                                <th>Meaning</th>
+                                <th>Typical Cause</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>200 / 201</td>
+                                <td>Success</td>
+                                <td>Request completed successfully.</td>
+                            </tr>
+                            <tr>
+                                <td>401</td>
+                                <td>Unauthorized</td>
+                                <td>Missing or invalid token.</td>
+                            </tr>
+                            <tr>
+                                <td>403</td>
+                                <td>Forbidden</td>
+                                <td>User lacks required role or verification status.</td>
+                            </tr>
+                            <tr>
+                                <td>404</td>
+                                <td>Not Found</td>
+                                <td>Requested record does not exist.</td>
+                            </tr>
+                            <tr>
+                                <td>419</td>
+                                <td>Session/CSRF issue</td>
+                                <td>Mostly seen in web-form contexts.</td>
+                            </tr>
+                            <tr>
+                                <td>422</td>
+                                <td>Validation Error</td>
+                                <td>Invalid request parameters or payload.</td>
+                            </tr>
+                            <tr>
+                                <td>500</td>
+                                <td>Server Error</td>
+                                <td>Unhandled backend exception.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="auth-endpoints" class="doc-section">
+                <h2>Auth Endpoints</h2>
+
+                <article class="endpoint">
+                    <div class="endpoint-head">
+                        <span class="method post">POST</span>
+                        <code>/auth/login</code>
+                    </div>
+                    <p>Authenticate user and create Sanctum token.</p>
+                    <h4>Request Body</h4>
+                    <div class="code-block">
+                        <pre><code>{
+  "email": "resident@example.com",
+  "password": "your-password",
+  "device_name": "web-client"
+}</code></pre>
+                    </div>
+                    <h4>Response</h4>
+                    <div class="code-block">
+                        <pre><code>{
+  "token": "1|token-value",
+  "token_type": "Bearer",
+  "user": { "id": 3, "name": "Juan Dela Cruz", "role": "resident" }
+}</code></pre>
+                    </div>
+                </article>
+
+                <article class="endpoint">
+                    <div class="endpoint-head">
+                        <span class="method get">GET</span>
+                        <code>/auth/me</code>
+                    </div>
+                    <p>Get currently authenticated user profile.</p>
+                </article>
+
+                <article class="endpoint">
+                    <div class="endpoint-head">
+                        <span class="method post">POST</span>
+                        <code>/auth/logout</code>
+                    </div>
+                    <p>Revoke current access token.</p>
+                </article>
+            </section>
+
+            <section id="resident-events" class="doc-section">
+                <h2>Resident Event Endpoints</h2>
+
+                <article class="endpoint">
+                    <div class="endpoint-head">
+                        <span class="method get">GET</span>
+                        <code>/events</code>
+                    </div>
+                    <p>List discoverable community events for verified residents.</p>
+                    <h4>Query Parameters</h4>
+                    <ul>
+                        <li><code>status</code> (optional): upcoming, live, completed</li>
+                        <li><code>search</code> (optional): keyword search by event title</li>
+                    </ul>
+                </article>
+
+                <article class="endpoint">
+                    <div class="endpoint-head">
+                        <span class="method get">GET</span>
+                        <code>/events/{event}</code>
+                    </div>
+                    <p>Get full event details including schedule, fee, and registration status context.</p>
+                </article>
+
+                <article class="endpoint">
+                    <div class="endpoint-head">
+                        <span class="method post">POST</span>
+                        <code>/events/{event}/register</code>
+                    </div>
+                    <p>Register current resident to an event. Returns direct registration for free events or Stripe
+                        checkout URL for paid events.</p>
+                    <h4>Response Notes</h4>
+                    <ul>
+                        <li>Free events: returns completed registration payload.</li>
+                        <li>Paid events: returns <code>checkout_url</code> for payment.</li>
+                    </ul>
+                </article>
+            </section>
+
+            <section id="resident-incidents" class="doc-section">
+                <h2>Resident Incident Endpoints</h2>
+
+                <article class="endpoint">
+                    <div class="endpoint-head">
+                        <span class="method get">GET</span>
+                        <code>/incidents</code>
+                    </div>
+                    <p>List incidents for current resident.</p>
+                    <h4>Query Parameters</h4>
+                    <ul>
+                        <li><code>scope</code> (optional): <code>filed</code> or <code>respondent</code></li>
+                    </ul>
+                </article>
+
+                <article class="endpoint">
+                    <div class="endpoint-head">
+                        <span class="method post">POST</span>
+                        <code>/incidents</code>
+                    </div>
+                    <p>Submit a new incident report.</p>
+                    <h4>Request Body</h4>
+                    <div class="code-block">
+                        <pre><code>{
+  "category": "Noise Complaint",
+  "description": "Loud music past midnight.",
+  "incident_date": "2026-04-25",
+  "respondent_email": "neighbor@example.com"
+}</code></pre>
+                    </div>
+                </article>
+
+                <article class="endpoint">
+                    <div class="endpoint-head">
+                        <span class="method get">GET</span>
+                        <code>/incidents/{incident}</code>
+                    </div>
+                    <p>Get a single incident report if owned by current resident context.</p>
+                </article>
+            </section>
+
+            <section id="resident-documents" class="doc-section">
+                <h2>Resident Document Endpoints</h2>
+
+                <article class="endpoint">
+                    <div class="endpoint-head">
+                        <span class="method get">GET</span>
+                        <code>/documents</code>
+                    </div>
+                    <p>List resident document requests and statuses.</p>
+                </article>
+
+                <article class="endpoint">
+                    <div class="endpoint-head">
+                        <span class="method post">POST</span>
+                        <code>/documents</code>
+                    </div>
+                    <p>Create document request and return Stripe checkout URL when payment is required.</p>
+                    <h4>Request Body</h4>
+                    <div class="code-block">
+                        <pre><code>{
+  "document_type": "Barangay Clearance",
+  "purpose": "Employment requirement",
+  "quantity": 1
+}</code></pre>
+                    </div>
+                </article>
+
+                <article class="endpoint">
+                    <div class="endpoint-head">
+                        <span class="method get">GET</span>
+                        <code>/documents/{documentRequest}</code>
+                    </div>
+                    <p>Get details of one document request.</p>
+                </article>
+            </section>
+
+            <section id="notifications" class="doc-section">
+                <h2>Notification Endpoints</h2>
+
+                <article class="endpoint">
+                    <div class="endpoint-head">
+                        <span class="method get">GET</span>
+                        <code>/notifications</code>
+                    </div>
+                    <p>List authenticated user notifications.</p>
+                </article>
+
+                <article class="endpoint">
+                    <div class="endpoint-head">
+                        <span class="method post">POST</span>
+                        <code>/notifications/read-all</code>
+                    </div>
+                    <p>Mark all current user notifications as read.</p>
+                </article>
+
+                <article class="endpoint">
+                    <div class="endpoint-head">
+                        <span class="method post">POST</span>
+                        <code>/notifications/{notification}/read</code>
+                    </div>
+                    <p>Mark one notification as read.</p>
+                </article>
+            </section>
+
+            <section id="admin-events" class="doc-section">
+                <h2>Admin Event Endpoints</h2>
+                <p class="muted">All routes in this section require admin role + Sanctum token.</p>
+
+                <article class="endpoint">
+                    <div class="endpoint-head">
+                        <span class="method get">GET</span>
+                        <code>/admin/community-events</code>
+                    </div>
+                    <p>List all community events for administration.</p>
+                </article>
+
+                <article class="endpoint">
+                    <div class="endpoint-head">
+                        <span class="method post">POST</span>
+                        <code>/admin/community-events</code>
+                    </div>
+                    <p>Create event and trigger notification workflow.</p>
+                </article>
+
+                <article class="endpoint">
+                    <div class="endpoint-head">
+                        <span class="method get">GET</span>
+                        <code>/admin/community-events/{event}</code>
+                    </div>
+                    <p>View event details and management metadata.</p>
+                </article>
+
+                <article class="endpoint">
+                    <div class="endpoint-head">
+                        <span class="method put">PUT</span>
+                        <code>/admin/community-events/{event}</code>
+                    </div>
+                    <p>Update event details.</p>
+                </article>
+
+                <article class="endpoint">
+                    <div class="endpoint-head">
+                        <span class="method delete">DELETE</span>
+                        <code>/admin/community-events/{event}</code>
+                    </div>
+                    <p>Delete event record.</p>
+                </article>
+
+                <article class="endpoint">
+                    <div class="endpoint-head">
+                        <span class="method post">POST</span>
+                        <code>/admin/community-events/{event}/live</code>
+                    </div>
+                    <p>Toggle NOW LIVE status used by QR check-in validation.</p>
+                </article>
+
+                <article class="endpoint">
+                    <div class="endpoint-head">
+                        <span class="method post">POST</span>
+                        <code>/admin/community-events/{event}/simulate-registrations</code>
+                    </div>
+                    <p>Generate sample registrations for testing and demonstrations.</p>
+                </article>
+
+                <article class="endpoint">
+                    <div class="endpoint-head">
+                        <span class="method get">GET</span>
+                        <code>/admin/community-events/{event}/registrations</code>
+                    </div>
+                    <p>List event registrants including payment and check-in status.</p>
+                </article>
+            </section>
+
+            <section id="admin-incidents" class="doc-section">
+                <h2>Admin Incident Endpoints</h2>
+
+                <article class="endpoint">
+                    <div class="endpoint-head">
+                        <span class="method get">GET</span>
+                        <code>/admin/incidents</code>
+                    </div>
+                    <p>List all filed incidents for review.</p>
+                </article>
+
+                <article class="endpoint">
+                    <div class="endpoint-head">
+                        <span class="method get">GET</span>
+                        <code>/admin/incidents/{incident}</code>
+                    </div>
+                    <p>View complete incident details.</p>
+                </article>
+
+                <article class="endpoint">
+                    <div class="endpoint-head">
+                        <span class="method post">POST</span>
+                        <code>/admin/incidents/{incident}/review</code>
+                    </div>
+                    <p>Accept or reject incident with outcome and notes.</p>
+                </article>
+            </section>
+
+            <section id="admin-documents" class="doc-section">
+                <h2>Admin Document Endpoints</h2>
+
+                <article class="endpoint">
+                    <div class="endpoint-head">
+                        <span class="method get">GET</span>
+                        <code>/admin/documents</code>
+                    </div>
+                    <p>List all document requests submitted by residents.</p>
+                </article>
+
+                <article class="endpoint">
+                    <div class="endpoint-head">
+                        <span class="method get">GET</span>
+                        <code>/admin/documents/{documentRequest}</code>
+                    </div>
+                    <p>Get one document request details.</p>
+                </article>
+
+                <article class="endpoint">
+                    <div class="endpoint-head">
+                        <span class="method post">POST</span>
+                        <code>/admin/documents/{documentRequest}/approve</code>
+                    </div>
+                    <p>Approve document request and move to fulfillment.</p>
+                </article>
+
+                <article class="endpoint">
+                    <div class="endpoint-head">
+                        <span class="method post">POST</span>
+                        <code>/admin/documents/{documentRequest}/reject</code>
+                    </div>
+                    <p>Reject document request and handle refund workflow when applicable.</p>
+                </article>
+            </section>
+
+            <section id="openapi" class="doc-section">
+                <h2>OpenAPI Specification Endpoint</h2>
+                <article class="endpoint">
+                    <div class="endpoint-head">
+                        <span class="method get">GET</span>
+                        <code>/docs/openapi.yaml</code>
+                    </div>
+                    <p>Returns OpenAPI 3.0.3 YAML definition of available API routes.</p>
+                </article>
+
+                <h3>Quick cURL Example</h3>
+                <div class="code-row">
+                    <code>curl -H "Accept: application/json" https://your-domain.com/api/v1/events</code>
+                    <button class="copy-btn"
+                        data-copy='curl -H "Accept: application/json" https://your-domain.com/api/v1/events'>Copy</button>
+                </div>
+            </section>
+
+            <section id="testing-demonstration" class="doc-section">
+                <h2>Testing and Demonstration</h2>
+                <p>
+                    This is the exact test flow we used while developing the API. It is written as an execution log so
+                    panel members can see what was called, what should return, and what output proves the integration is
+                    working.
+                </p>
+
+                <h3>Pre-check Before Running API Tests</h3>
+                <ul>
+                    <li>Backend server running (Laravel via XAMPP/Apache or <code>php artisan serve</code>).</li>
+                    <li>Public URL active (ngrok) if testing outside local machine.</li>
+                    <li>Seeded users available (<code>AdminAndResidentsSeeder</code>) for resident/admin credentials.</li>
+                    <li><code>Accept: application/json</code> is always included in request headers.</li>
+                </ul>
+
+                <h3>1) API Requests and Responses</h3>
+                <p class="muted">
+                    Start from unauthenticated route, then move to protected resident routes, then admin routes.
+                </p>
+
+                <h4>Step 1 - Login and Capture Token</h4>
+                <div class="code-block">
+                    <pre><code>POST /api/v1/auth/login
+
+Expected: 200 OK
+Expected keys: token, token_type, user</code></pre>
+                </div>
+                <div class="code-block">
+                    <pre><code>{
+  "token": "1|sanctum-token",
+  "token_type": "Bearer",
+  "user": {
+    "id": 7,
+    "name": "Resident 07",
+    "email": "resident1@example.com",
+    "role": "resident"
+  }
+}</code></pre>
+                </div>
+
+                <h4>Step 2 - Verify Protected Route Works With Token</h4>
+                <div class="code-block">
+                    <pre><code>GET /api/v1/auth/me
+
+Expected: 200 OK
+Expected: same user id/email returned from login token owner</code></pre>
+                </div>
+
+                <h4>Step 3 - Verify Resident Business Endpoint</h4>
+                <div class="code-block">
+                    <pre><code>GET /api/v1/events
+
+Expected: 200 OK
+Expected: list payload (can be empty array if no events yet)</code></pre>
+                </div>
+
+                <h4>Step 4 - Verify Middleware Rejects Invalid Access</h4>
+                <div class="code-block">
+                    <pre><code>GET /api/v1/events (without Authorization header)
+
+Expected: 401 Unauthenticated</code></pre>
+                </div>
+                <div class="code-block">
+                    <pre><code>{
+  "message": "Unauthenticated."
+}</code></pre>
+                </div>
+
+                <h4>Step 5 - Verify Admin Route Permission</h4>
+                <div class="code-block">
+                    <pre><code>GET /api/v1/admin/community-events using resident token
+
+Expected: 403 Forbidden</code></pre>
+                </div>
+
+                <h3>2) Integration Workflow Screenshots</h3>
+                <p class="muted">For actual defense/demo, these are the screenshots to capture in sequence:</p>
+                <ul>
+                    <li><strong>Auth workflow:</strong> login request and returned token in Postman/Insomnia.</li>
+                    <li><strong>Stripe workflow:</strong> event/document request response containing <code>checkout_url</code>.</li>
+                    <li><strong>Email workflow:</strong> Mailtrap inbox receiving event notification email.</li>
+                    <li><strong>Notification workflow:</strong> API action then reflected in notifications endpoint/list.</li>
+                    <li><strong>QR workflow:</strong> successful registration token and scanner check-in response.</li>
+                </ul>
+
+                <h3>3) cURL Commands Used in Actual Testing</h3>
+                <h4>Login (Resident)</h4>
+                <div class="code-block">
+                    <pre><code>curl -X POST "https://your-domain.com/api/v1/auth/login" \
+  -H "Accept: application/json" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "resident1@example.com",
+    "password": "helloworld123",
+    "device_name": "demo-client"
+  }'</code></pre>
+                </div>
+
+                <h4>Use Token on Protected Endpoint</h4>
+                <div class="code-block">
+                    <pre><code>curl -X GET "https://your-domain.com/api/v1/auth/me" \
+  -H "Accept: application/json" \
+  -H "Authorization: Bearer YOUR_TOKEN_HERE"</code></pre>
+                </div>
+
+                <h4>List Events (GET)</h4>
+                <div class="code-block">
+                    <pre><code>curl -X GET "https://your-domain.com/api/v1/events" \
+  -H "Accept: application/json" \
+  -H "Authorization: Bearer YOUR_TOKEN_HERE"</code></pre>
+                </div>
+
+                <h4>Create Incident</h4>
+                <div class="code-block">
+                    <pre><code>curl -X POST "https://your-domain.com/api/v1/incidents" \
+  -H "Accept: application/json" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_TOKEN_HERE" \
+  -d '{
+    "category": "Noise Complaint",
+    "description": "Loud music after curfew.",
+    "incident_date": "2026-04-28",
+    "respondent_email": "neighbor@example.com"
+  }'</code></pre>
+                </div>
+
+                <h4>Negative Test (No Token)</h4>
+                <div class="code-block">
+                    <pre><code>curl -X GET "https://your-domain.com/api/v1/events" \
+  -H "Accept: application/json"</code></pre>
+                </div>
+
+                <h3>4) Evidence Checklist for Submission</h3>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Requirement</th>
+                                <th>Evidence Collected</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>API requests and responses</td>
+                                <td>Login 200, resident endpoint 200, middleware failure 401/403</td>
+                                <td>Required</td>
+                            </tr>
+                            <tr>
+                                <td>Screenshots of integration workflows</td>
+                                <td>Auth, Stripe, Mailtrap, Notifications, QR scan/check-in</td>
+                                <td>Required</td>
+                            </tr>
+                            <tr>
+                                <td>Sample commands using curl</td>
+                                <td>Commands executed with terminal output screenshots</td>
+                                <td>Required</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="api-docs.js" defer></script>
+</body>
+
+</html>
