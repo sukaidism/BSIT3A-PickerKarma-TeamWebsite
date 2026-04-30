@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PickerKarma - System Architecture</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Calistoga&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
+    <link rel="stylesheet" href="app.css">
+    <style>
+        .diagram-page {
+            min-height: 100vh;
+            background: var(--surface-900);
+            color: var(--text-100);
+            padding: 7rem 0 4rem;
+        }
+        .diagram-shell {
+            background: rgba(20, 28, 48, 0.92);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 1rem;
+            padding: 1rem;
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.28);
+            overflow: hidden;
+        }
+        .diagram-actions {
+            margin: 0 0 1rem;
+            display: flex;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+        }
+        .diagram-toolbar {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.45rem;
+            margin-bottom: 0.7rem;
+        }
+        .zoom-btn {
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            background: rgba(255, 255, 255, 0.08);
+            color: #f3f7ff;
+            border-radius: 0.55rem;
+            min-width: 40px;
+            height: 34px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .zoom-btn:hover {
+            background: rgba(255, 255, 255, 0.16);
+        }
+        .arch-svg {
+            display: block;
+            width: 100%;
+            min-width: 0;
+            height: auto;
+            background: #f6f8fc;
+            border-radius: 0.8rem;
+            border: 1px solid #dbe2ef;
+            user-select: none;
+        }
+    </style>
+</head>
+<body class="page-home">
+    <header class="site-header" id="siteHeader">
+        <div class="container header-inner">
+            <a class="brand" href="index.html#home">PickerKarma</a>
+            <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation" aria-expanded="false" aria-controls="siteNav">
+                <i class="fa-solid fa-bars" aria-hidden="true"></i>
+            </button>
+            <nav class="nav" id="siteNav" aria-label="Main navigation">
+                <a class="nav-link" href="index.html#home">Home</a>
+                <a class="nav-link" href="index.html#team">Team</a>
+                <a class="nav-link" href="index.html#project">Project</a>
+                <a class="nav-link" href="index.html#video">Video</a>
+                <a class="nav-link" href="index.html#updates">Updates</a>
+                <a class="nav-link" href="bpmn-diagram.html">Diagrams</a>
+                <a class="nav-link" href="integration-guidelines.html">Integration Guide</a>
+                <a class="nav-link" href="api-docs.html">API Docs</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="diagram-page">
+        <section class="container">
+            <div class="section-head reveal">
+                <div class="section-label">
+                    <span class="label-dot pulsing-dot"></span>
+                    <span>System Design</span>
+                </div>
+                <h2>Barangay Portal System Architecture</h2>
+                <p>Clean left-to-right architecture view for documentation and presentation.</p>
+            </div>
+
+            <div class="diagram-actions reveal">
+                <a class="btn btn-outline" href="index.html#updates"><i class="fa-solid fa-arrow-left"></i> Back to Updates</a>
+                <a class="btn btn-outline" href="bpmn-diagram.html">Open BPMN View</a>
+            </div>
+
+            <div class="diagram-shell reveal">
+                <div class="diagram-toolbar" aria-label="Diagram controls">
+                    <button class="zoom-btn" id="zoomOutBtn" type="button" aria-label="Zoom out">-</button>
+                    <button class="zoom-btn" id="zoomResetBtn" type="button" aria-label="Reset zoom">90%</button>
+                    <button class="zoom-btn" id="zoomInBtn" type="button" aria-label="Zoom in">+</button>
+                </div>
+                <svg id="archSvg" class="arch-svg" viewBox="0 0 2400 1160" role="img" aria-label="Barangay Portal System Architecture diagram">
+                    <defs>
+                        <marker id="arrowHead" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+                            <path d="M 0 0 L 10 5 L 0 10 z" fill="#4c6085"></path>
+                        </marker>
+                        <style>
+                            .title { font: 700 26px Inter, sans-serif; fill: #1f2a44; }
+                            .group-title { font: 700 18px Inter, sans-serif; fill: #2d3b58; }
+                            .node-title { font: 600 15px Inter, sans-serif; fill: #1f2a44; text-anchor: middle; }
+                            .node-sub { font: 500 12px Inter, sans-serif; fill: #4a5d84; text-anchor: middle; }
+                            .group-box { fill: #ffffff; stroke: #ccd7ea; stroke-width: 2; rx: 16; }
+                            .laravel-box { fill: #f5f8ff; stroke: #9eb0d1; stroke-width: 2; rx: 14; }
+                            .node { fill: #ffffff; stroke: #9fb0ce; stroke-width: 1.8; rx: 10; }
+                            .external { fill: #f7f9fe; }
+                            .db-body { fill: #ffffff; stroke: #9fb0ce; stroke-width: 1.8; }
+                            .line { fill: none; stroke: #4c6085; stroke-width: 2; marker-end: url(#arrowHead); }
+                            .label { font: 600 12px Inter, sans-serif; fill: #3e5078; }
+                        </style>
+                    </defs>
+
+                    <text class="title" x="60" y="48">Barangay Portal System Architecture</text>
+
+                    <rect class="group-box" x="40" y="80" width="380" height="940"></rect>
+                    <text class="group-title" x="60" y="115">1. Clients</text>
+
+                    <rect class="group-box" x="450" y="80" width="1020" height="940"></rect>
+                    <text class="group-title" x="470" y="115">2. Laravel 13 Application (PHP 8.3)</text>
+
+                    <rect class="group-box" x="1490" y="80" width="420" height="430"></rect>
+                    <text class="group-title" x="1510" y="115">3. Internal Services / Data Resources</text>
+
+                    <rect class="group-box" x="1490" y="530" width="870" height="490"></rect>
+                    <text class="group-title" x="1510" y="565">4. External Services and Integrations</text>
+
+                    <rect class="node" x="90" y="180" width="280" height="90"></rect>
+                    <text class="node-title" x="230" y="217">Resident Web UI</text>
+                    <text class="node-sub" x="230" y="242">Blade + Livewire</text>
+
+                    <rect class="node" x="90" y="330" width="280" height="90"></rect>
+                    <text class="node-title" x="230" y="367">Admin Web UI</text>
+                    <text class="node-sub" x="230" y="392">Blade + Livewire</text>
+
+                    <rect class="node" x="90" y="480" width="280" height="90"></rect>
+                    <text class="node-title" x="230" y="532">Mobile/3rd-party API Client</text>
+
+                    <rect class="laravel-box" x="500" y="140" width="920" height="820"></rect>
+                    <text class="group-title" x="530" y="172">Laravel 13 Application (PHP 8.3)</text>
+
+                    <rect class="node" x="560" y="210" width="290" height="90"></rect>
+                    <text class="node-title" x="705" y="262">Web Routes + Controllers</text>
+
+                    <rect class="node" x="560" y="360" width="290" height="90"></rect>
+                    <text class="node-title" x="705" y="395">REST API /api/v1</text>
+                    <text class="node-sub" x="705" y="420">Sanctum</text>
+
+                    <rect class="node" x="940" y="280" width="340" height="120"></rect>
+                    <text class="node-title" x="1110" y="323">Middleware</text>
+                    <text class="node-sub" x="1110" y="348">auth, verified, admin, resident.verified</text>
+
+                    <rect class="node" x="560" y="600" width="520" height="120"></rect>
+                    <text class="node-title" x="820" y="640">Domain Services</text>
+                    <text class="node-sub" x="820" y="665">EventPayment, IncidentPayment, Notification, Image Storage</text>
+
+                    <rect class="node" x="1130" y="590" width="260" height="120"></rect>
+                    <text class="node-title" x="1260" y="625">Queue Jobs</text>
+                    <text class="node-sub" x="1260" y="650">SendZapierWebhookJob, SendN8nIncidentWebhookJob</text>
+
+                    <rect class="node" x="1130" y="760" width="260" height="90"></rect>
+                    <text class="node-title" x="1260" y="797">Events + Notifications</text>
+                    <text class="node-sub" x="1260" y="822">PortalNotificationSent</text>
+
+                    <g>
+                        <ellipse class="db-body" cx="1610" cy="220" rx="130" ry="22"></ellipse>
+                        <rect class="db-body" x="1480" y="220" width="260" height="120"></rect>
+                        <ellipse class="db-body" cx="1610" cy="340" rx="130" ry="22"></ellipse>
+                        <text class="node-title" x="1610" y="285">MySQL</text>
+                    </g>
+
+                    <rect class="node" x="1750" y="245" width="130" height="80"></rect>
+                    <text class="node-title" x="1815" y="285">Storage:</text>
+                    <text class="node-sub" x="1815" y="305">local/public</text>
+
+                    <rect class="node external" x="1540" y="620" width="220" height="80"></rect>
+                    <text class="node-title" x="1650" y="665">SMTP / Mailtrap</text>
+
+                    <rect class="node external" x="1790" y="620" width="220" height="80"></rect>
+                    <text class="node-title" x="1900" y="665">Stripe API</text>
+
+                    <rect class="node external" x="2040" y="620" width="220" height="80"></rect>
+                    <text class="node-title" x="2150" y="665">Pusher Channels</text>
+
+                    <rect class="node external" x="1540" y="760" width="220" height="80"></rect>
+                    <text class="node-title" x="1650" y="805">Zapier Webhook</text>
+
+                    <rect class="node external" x="1790" y="760" width="220" height="80"></rect>
+                    <text class="node-title" x="1900" y="805">n8n Webhook</text>
+
+                    <rect class="node external" x="2040" y="760" width="220" height="80"></rect>
+                    <text class="node-title" x="2150" y="805">POST /stripe/webhook/</text>
+
+                    <path class="line" d="M370 225 L560 255"></path>
+                    <path class="line" d="M370 375 L560 255"></path>
+                    <path class="line" d="M370 525 L560 405"></path>
+
+                    <path class="line" d="M850 255 L940 325"></path>
+                    <path class="line" d="M850 405 L940 355"></path>
+                    <path class="line" d="M1280 340 L820 600"></path>
+
+                    <path class="line" d="M1080 640 L1480 285"></path>
+                    <path class="line" d="M1080 660 L1750 285"></path>
+                    <path class="line" d="M1080 625 L1540 660"></path>
+                    <path class="line" d="M1080 645 L1790 660"></path>
+                    <path class="line" d="M1080 665 L2040 660"></path>
+                    <path class="line" d="M1080 690 L1130 650"></path>
+                    <path class="line" d="M1080 705 L1130 800"></path>
+
+                    <path class="line" d="M1390 630 L1540 800"></path>
+                    <path class="line" d="M1390 670 L1790 800"></path>
+
+                    <path class="line" d="M1760 800 L705 800 L705 300"></path>
+                    <text class="label" x="1060" y="790">Callback with document URL</text>
+                    <path class="line" d="M2010 800 L740 800 L740 300"></path>
+                    <text class="label" x="1120" y="835">Callback with AI summary</text>
+
+                    <path class="line" d="M1900 700 L2150 760"></path>
+                    <text class="label" x="1935" y="740">checkout.session.completed</text>
+                    <path class="line" d="M2040 800 L900 800 L900 720"></path>
+
+                    <path class="line" d="M1390 805 L2040 680"></path>
+                    <path class="line" d="M2040 650 L230 650 L230 270"></path>
+                    <path class="line" d="M2040 670 L260 670 L260 420"></path>
+                </svg>
+            </div>
+        </section>
+    </main>
+
+    <script src="app.js" defer></script>
+    <script>
+        (function () {
+            const svg = document.getElementById("archSvg");
+            const zoomInBtn = document.getElementById("zoomInBtn");
+            const zoomOutBtn = document.getElementById("zoomOutBtn");
+            const zoomResetBtn = document.getElementById("zoomResetBtn");
+            if (!svg) return;
+
+            const initialViewBox = { x: 0, y: 0, width: 2400, height: 1160 };
+            let currentZoom = 0.9;
+
+            function renderViewBox() {
+                const width = initialViewBox.width / currentZoom;
+                const height = initialViewBox.height / currentZoom;
+                const maxX = initialViewBox.width - width;
+                const maxY = initialViewBox.height - height;
+                const x = Math.max(0, Math.min(viewBox.x, maxX));
+                const y = Math.max(0, Math.min(viewBox.y, maxY));
+                viewBox.x = x;
+                viewBox.y = y;
+                viewBox.width = width;
+                viewBox.height = height;
+                svg.setAttribute("viewBox", `${x} ${y} ${width} ${height}`);
+                if (zoomResetBtn) zoomResetBtn.textContent = `${Math.round(currentZoom * 100)}%`;
+            }
+
+            function setZoom(next) {
+                const bounded = Math.max(0.5, Math.min(2.2, next));
+                const cx = viewBox.x + viewBox.width / 2;
+                const cy = viewBox.y + viewBox.height / 2;
+                currentZoom = bounded;
+                viewBox.width = initialViewBox.width / currentZoom;
+                viewBox.height = initialViewBox.height / currentZoom;
+                viewBox.x = cx - viewBox.width / 2;
+                viewBox.y = cy - viewBox.height / 2;
+                renderViewBox();
+            }
+
+            const viewBox = { ...initialViewBox };
+            setZoom(0.9);
+            viewBox.x = 0;
+            viewBox.y = 0;
+            renderViewBox();
+
+            if (zoomInBtn) zoomInBtn.addEventListener("click", () => setZoom(currentZoom + 0.1));
+            if (zoomOutBtn) zoomOutBtn.addEventListener("click", () => setZoom(currentZoom - 0.1));
+            if (zoomResetBtn) {
+                zoomResetBtn.addEventListener("click", () => {
+                    currentZoom = 0.9;
+                    viewBox.x = 0;
+                    viewBox.y = 0;
+                    renderViewBox();
+                });
+            }
+
+            let dragging = false;
+            let start = { x: 0, y: 0 };
+            let startBox = { x: 0, y: 0 };
+            svg.style.cursor = "grab";
+
+            svg.addEventListener("mousedown", (e) => {
+                if (e.button !== 0) return;
+                dragging = true;
+                start = { x: e.clientX, y: e.clientY };
+                startBox = { x: viewBox.x, y: viewBox.y };
+                svg.style.cursor = "grabbing";
+            });
+
+            window.addEventListener("mouseup", () => {
+                dragging = false;
+                svg.style.cursor = "grab";
+            });
+
+            window.addEventListener("mousemove", (e) => {
+                if (!dragging) return;
+                const dx = (e.clientX - start.x) * (viewBox.width / svg.clientWidth);
+                const dy = (e.clientY - start.y) * (viewBox.height / svg.clientHeight);
+                viewBox.x = startBox.x - dx;
+                viewBox.y = startBox.y - dy;
+                renderViewBox();
+            });
+        })();
+    </script>
+</body>
+</html>

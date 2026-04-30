@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PickerKarma - BPMN Diagram</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Calistoga&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
+    <link rel="stylesheet" href="app.css">
+    <link rel="stylesheet" href="https://unpkg.com/bpmn-js@17.9.2/dist/assets/diagram-js.css">
+    <link rel="stylesheet" href="https://unpkg.com/bpmn-js@17.9.2/dist/assets/bpmn-js.css">
+    <link rel="stylesheet" href="https://unpkg.com/bpmn-js@17.9.2/dist/assets/bpmn-font/css/bpmn.css">
+    <style>
+        .diagram-page {
+            min-height: 100vh;
+            background: var(--surface-900);
+            color: var(--text-100);
+            padding: 7rem 0 4rem;
+        }
+
+        .diagram-shell {
+            background: rgba(20, 28, 48, 0.92);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1.1rem;
+            padding: 1rem;
+            overflow: hidden;
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .diagram-actions {
+            margin: 0 0 1rem;
+        }
+        .diagram-toolbar {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.45rem;
+            margin-bottom: 0.7rem;
+        }
+        .zoom-btn {
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            background: rgba(255, 255, 255, 0.08);
+            color: #f3f7ff;
+            border-radius: 0.55rem;
+            min-width: 40px;
+            height: 34px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .zoom-btn:hover {
+            background: rgba(255, 255, 255, 0.16);
+        }
+        #bpmnCanvas {
+            width: 100%;
+            min-width: 0;
+            height: clamp(520px, 74vh, 860px);
+            border-radius: 0.9rem;
+            background: #f5f8ff;
+            border: 1px solid rgba(18, 34, 68, 0.14);
+        }
+        #bpmnCanvas .djs-container {
+            background: radial-gradient(circle at 20% 10%, #ffffff, #eef4ff 55%, #e7efff);
+        }
+        #bpmnCanvas .djs-scrollable {
+            overflow: hidden !important;
+        }
+        #bpmnCanvas .djs-connection path {
+            stroke-width: 1.8px;
+        }
+        #bpmnCanvas .djs-label {
+            font-size: 13px !important;
+            font-weight: 600;
+        }
+        #bpmnCanvas .djs-element .djs-visual > :nth-child(1) {
+            stroke-width: 1.8px;
+        }
+        .bpmn-note {
+            margin-top: 0.6rem;
+            text-align: right;
+            font-size: 0.86rem;
+            color: rgba(230, 238, 255, 0.88);
+        }
+    </style>
+</head>
+<body class="page-home">
+    <header class="site-header" id="siteHeader">
+        <div class="container header-inner">
+            <a class="brand" href="index.html#home">PickerKarma</a>
+            <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation" aria-expanded="false" aria-controls="siteNav">
+                <i class="fa-solid fa-bars" aria-hidden="true"></i>
+            </button>
+            <nav class="nav" id="siteNav" aria-label="Main navigation">
+                <a class="nav-link" href="index.html#home">Home</a>
+                <a class="nav-link" href="index.html#team">Team</a>
+                <a class="nav-link" href="index.html#project">Project</a>
+                <a class="nav-link" href="index.html#video">Video</a>
+                <a class="nav-link" href="index.html#updates">Updates</a>
+                <a class="nav-link" href="bpmn-diagram.html">Diagrams</a>
+                <a class="nav-link" href="integration-guidelines.html">Integration Guide</a>
+                <a class="nav-link" href="api-docs.html">API Docs</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="diagram-page">
+        <section class="container">
+            <div class="section-head reveal">
+                <div class="section-label">
+                    <span class="label-dot pulsing-dot"></span>
+                    <span>Week 2 - Analysis</span>
+                </div>
+                <h2>Barangay Portal System Workflow and Integration Architecture</h2>
+                <p>BPMN-style architecture flow for clients, Laravel core, storage, queues, webhooks, and external services.</p>
+            </div>
+
+            <div class="diagram-actions reveal">
+                <a class="btn btn-outline" href="index.html#updates"><i class="fa-solid fa-arrow-left"></i> Back to Updates</a>
+                <a class="btn btn-outline" href="system-architecture.html">System Architecture View</a>
+            </div>
+
+            <div class="diagram-shell reveal">
+                <div class="diagram-toolbar" aria-label="Diagram controls">
+                    <button class="zoom-btn" id="zoomOutBtn" type="button" aria-label="Zoom out">-</button>
+                    <button class="zoom-btn" id="zoomResetBtn" type="button" aria-label="Reset zoom">100%</button>
+                    <button class="zoom-btn" id="zoomInBtn" type="button" aria-label="Zoom in">+</button>
+                </div>
+                <div id="bpmnCanvas" aria-label="BPMN workflow diagram"></div>
+                <p class="bpmn-note">Use +/- to zoom. Drag anywhere to pan.</p>
+            </div>
+        </section>
+    </main>
+    <script src="app.js" defer></script>
+    <script src="https://unpkg.com/bpmn-js@17.9.2/dist/bpmn-viewer.development.js"></script>
+    <script>
+        const bpmnXml = `<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+  xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+  xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+  id="Definitions_1"
+  targetNamespace="http://bpmn.io/schema/bpmn">
+  <bpmn:process id="Process_1" name="Barangay Portal Architecture" isExecutable="false">
+    <bpmn:laneSet id="LaneSet_1">
+      <bpmn:lane id="Lane_Clients" name="1. Clients">
+        <bpmn:flowNodeRef>Task_ResidentUI</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_AdminUI</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_MobileClient</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Core" name="2. Laravel 13 Application Core">
+        <bpmn:flowNodeRef>Task_WebRoutes</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_RestApi</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Middleware</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_DomainServices</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_QueueJobs</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_EventsNotifications</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Data" name="3. Internal Data and Storage"></bpmn:lane>
+      <bpmn:lane id="Lane_External" name="4. External Services">
+        <bpmn:flowNodeRef>Task_SMTP</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_StripeAPI</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Pusher</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Zapier</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_N8N</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Webhook" name="5. Webhook Endpoint">
+        <bpmn:flowNodeRef>Task_StripeWebhook</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+
+    <bpmn:task id="Task_ResidentUI" name="Resident Web UI&#10;Blade + Livewire">
+      <bpmn:outgoing>Flow_1</bpmn:outgoing>
+      <bpmn:incoming>Flow_22</bpmn:incoming>
+    </bpmn:task>
+    <bpmn:task id="Task_AdminUI" name="Admin Web UI&#10;Blade + Livewire">
+      <bpmn:outgoing>Flow_2</bpmn:outgoing>
+      <bpmn:incoming>Flow_23</bpmn:incoming>
+    </bpmn:task>
+    <bpmn:task id="Task_MobileClient" name="Mobile / Third-party&#10;API Client">
+      <bpmn:outgoing>Flow_3</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="Task_WebRoutes" name="Web Routes + Controllers">
+      <bpmn:incoming>Flow_1</bpmn:incoming>
+      <bpmn:incoming>Flow_2</bpmn:incoming>
+      <bpmn:incoming>Flow_15</bpmn:incoming>
+      <bpmn:incoming>Flow_16</bpmn:incoming>
+      <bpmn:outgoing>Flow_4</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Task_RestApi" name="REST API /api/v1&#10;Auth: Sanctum">
+      <bpmn:incoming>Flow_3</bpmn:incoming>
+      <bpmn:outgoing>Flow_5</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Task_Middleware" name="Middleware&#10;auth | verified | admin | resident.verified">
+      <bpmn:incoming>Flow_4</bpmn:incoming>
+      <bpmn:incoming>Flow_5</bpmn:incoming>
+      <bpmn:outgoing>Flow_6</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Task_DomainServices" name="Domain Services&#10;EventPayment | IncidentPayment | Notification | Image Storage">
+      <bpmn:incoming>Flow_6</bpmn:incoming>
+      <bpmn:incoming>Flow_20</bpmn:incoming>
+      <bpmn:outgoing>Flow_7</bpmn:outgoing>
+      <bpmn:outgoing>Flow_8</bpmn:outgoing>
+      <bpmn:outgoing>Flow_9</bpmn:outgoing>
+      <bpmn:outgoing>Flow_10</bpmn:outgoing>
+      <bpmn:outgoing>Flow_11</bpmn:outgoing>
+      <bpmn:outgoing>Flow_12</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Task_QueueJobs" name="Queue Jobs&#10;SendZapierWebhookJob&#10;SendN8nIncidentWebhookJob">
+      <bpmn:incoming>Flow_11</bpmn:incoming>
+      <bpmn:outgoing>Flow_13</bpmn:outgoing>
+      <bpmn:outgoing>Flow_14</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Task_EventsNotifications" name="Events + Notifications&#10;PortalNotificationSent">
+      <bpmn:incoming>Flow_12</bpmn:incoming>
+      <bpmn:outgoing>Flow_21</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:dataStoreReference id="DataStore_MySQL" name="MySQL Database" />
+    <bpmn:dataStoreReference id="DataStore_Storage" name="Local/Public Storage" />
+
+    <bpmn:task id="Task_SMTP" name="SMTP / Mailtrap">
+      <bpmn:incoming>Flow_7</bpmn:incoming>
+    </bpmn:task>
+    <bpmn:task id="Task_StripeAPI" name="Stripe API">
+      <bpmn:incoming>Flow_8</bpmn:incoming>
+      <bpmn:incoming>Flow_18</bpmn:incoming>
+      <bpmn:outgoing>Flow_19</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Task_Pusher" name="Pusher Channels">
+      <bpmn:incoming>Flow_10</bpmn:incoming>
+      <bpmn:incoming>Flow_21</bpmn:incoming>
+      <bpmn:outgoing>Flow_22</bpmn:outgoing>
+      <bpmn:outgoing>Flow_23</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Task_Zapier" name="Zapier Webhook">
+      <bpmn:incoming>Flow_13</bpmn:incoming>
+      <bpmn:outgoing>Flow_15</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Task_N8N" name="n8n Webhook">
+      <bpmn:incoming>Flow_14</bpmn:incoming>
+      <bpmn:outgoing>Flow_16</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="Task_StripeWebhook" name="POST /stripe/webhook/">
+      <bpmn:incoming>Flow_19</bpmn:incoming>
+      <bpmn:outgoing>Flow_20</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:sequenceFlow id="Flow_1" sourceRef="Task_ResidentUI" targetRef="Task_WebRoutes" />
+    <bpmn:sequenceFlow id="Flow_2" sourceRef="Task_AdminUI" targetRef="Task_WebRoutes" />
+    <bpmn:sequenceFlow id="Flow_3" sourceRef="Task_MobileClient" targetRef="Task_RestApi" />
+    <bpmn:sequenceFlow id="Flow_4" sourceRef="Task_WebRoutes" targetRef="Task_Middleware" />
+    <bpmn:sequenceFlow id="Flow_5" sourceRef="Task_RestApi" targetRef="Task_Middleware" />
+    <bpmn:sequenceFlow id="Flow_6" sourceRef="Task_Middleware" targetRef="Task_DomainServices" />
+    <bpmn:sequenceFlow id="Flow_7" sourceRef="Task_DomainServices" targetRef="Task_SMTP" />
+    <bpmn:sequenceFlow id="Flow_8" name="Payment request" sourceRef="Task_DomainServices" targetRef="Task_StripeAPI" />
+    <bpmn:sequenceFlow id="Flow_9" sourceRef="Task_DomainServices" targetRef="Task_Pusher" />
+    <bpmn:sequenceFlow id="Flow_10" sourceRef="Task_DomainServices" targetRef="Task_Pusher" />
+    <bpmn:sequenceFlow id="Flow_11" sourceRef="Task_DomainServices" targetRef="Task_QueueJobs" />
+    <bpmn:sequenceFlow id="Flow_12" sourceRef="Task_DomainServices" targetRef="Task_EventsNotifications" />
+    <bpmn:sequenceFlow id="Flow_13" sourceRef="Task_QueueJobs" targetRef="Task_Zapier" />
+    <bpmn:sequenceFlow id="Flow_14" sourceRef="Task_QueueJobs" targetRef="Task_N8N" />
+    <bpmn:sequenceFlow id="Flow_15" name="Callback: document URL" sourceRef="Task_Zapier" targetRef="Task_WebRoutes" />
+    <bpmn:sequenceFlow id="Flow_16" name="Callback: AI incident summary" sourceRef="Task_N8N" targetRef="Task_WebRoutes" />
+    <bpmn:sequenceFlow id="Flow_18" sourceRef="Task_DomainServices" targetRef="Task_StripeAPI" />
+    <bpmn:sequenceFlow id="Flow_19" name="checkout.session.completed" sourceRef="Task_StripeAPI" targetRef="Task_StripeWebhook" />
+    <bpmn:sequenceFlow id="Flow_20" name="Payment confirmation" sourceRef="Task_StripeWebhook" targetRef="Task_DomainServices" />
+    <bpmn:sequenceFlow id="Flow_21" name="PortalNotificationSent" sourceRef="Task_EventsNotifications" targetRef="Task_Pusher" />
+    <bpmn:sequenceFlow id="Flow_22" name="Realtime update" sourceRef="Task_Pusher" targetRef="Task_ResidentUI" />
+    <bpmn:sequenceFlow id="Flow_23" name="Realtime update" sourceRef="Task_Pusher" targetRef="Task_AdminUI" />
+
+    <bpmn:association id="Assoc_1" sourceRef="Task_DomainServices" targetRef="DataStore_MySQL" />
+    <bpmn:association id="Assoc_2" sourceRef="Task_DomainServices" targetRef="DataStore_Storage" />
+  </bpmn:process>
+
+  <bpmndi:BPMNDiagram id="Diagram_1">
+    <bpmndi:BPMNPlane id="Plane_1" bpmnElement="Process_1">
+      <bpmndi:BPMNShape id="Lane_Clients_di" bpmnElement="Lane_Clients" isHorizontal="true"><dc:Bounds x="100" y="80" width="2500" height="180" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Core_di" bpmnElement="Lane_Core" isHorizontal="true"><dc:Bounds x="100" y="260" width="2500" height="220" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Data_di" bpmnElement="Lane_Data" isHorizontal="true"><dc:Bounds x="100" y="480" width="2500" height="140" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_External_di" bpmnElement="Lane_External" isHorizontal="true"><dc:Bounds x="100" y="620" width="2500" height="220" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Webhook_di" bpmnElement="Lane_Webhook" isHorizontal="true"><dc:Bounds x="100" y="840" width="2500" height="120" /></bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_ResidentUI_di" bpmnElement="Task_ResidentUI"><dc:Bounds x="150" y="95" width="220" height="55" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_AdminUI_di" bpmnElement="Task_AdminUI"><dc:Bounds x="150" y="160" width="220" height="55" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_MobileClient_di" bpmnElement="Task_MobileClient"><dc:Bounds x="150" y="220" width="220" height="55" /></bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_WebRoutes_di" bpmnElement="Task_WebRoutes"><dc:Bounds x="500" y="110" width="260" height="65" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_RestApi_di" bpmnElement="Task_RestApi"><dc:Bounds x="500" y="205" width="260" height="65" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_Middleware_di" bpmnElement="Task_Middleware"><dc:Bounds x="870" y="155" width="360" height="90" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_DomainServices_di" bpmnElement="Task_DomainServices"><dc:Bounds x="1300" y="150" width="430" height="100" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_QueueJobs_di" bpmnElement="Task_QueueJobs"><dc:Bounds x="1760" y="135" width="300" height="100" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_EventsNotifications_di" bpmnElement="Task_EventsNotifications"><dc:Bounds x="1760" y="275" width="300" height="80" /></bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="DataStore_MySQL_di" bpmnElement="DataStore_MySQL"><dc:Bounds x="1360" y="510" width="160" height="70" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataStore_Storage_di" bpmnElement="DataStore_Storage"><dc:Bounds x="1570" y="510" width="170" height="70" /></bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_Pusher_di" bpmnElement="Task_Pusher"><dc:Bounds x="1900" y="640" width="220" height="60" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_SMTP_di" bpmnElement="Task_SMTP"><dc:Bounds x="1900" y="710" width="220" height="60" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_StripeAPI_di" bpmnElement="Task_StripeAPI"><dc:Bounds x="1900" y="780" width="220" height="50" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_Zapier_di" bpmnElement="Task_Zapier"><dc:Bounds x="2180" y="710" width="220" height="60" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_N8N_di" bpmnElement="Task_N8N"><dc:Bounds x="2180" y="780" width="220" height="50" /></bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_StripeWebhook_di" bpmnElement="Task_StripeWebhook"><dc:Bounds x="1900" y="870" width="220" height="60" /></bpmndi:BPMNShape>
+
+      <bpmndi:BPMNEdge id="Flow_1_di" bpmnElement="Flow_1"><di:waypoint x="370" y="122" /><di:waypoint x="500" y="142" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_2_di" bpmnElement="Flow_2"><di:waypoint x="370" y="187" /><di:waypoint x="500" y="142" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_3_di" bpmnElement="Flow_3"><di:waypoint x="370" y="247" /><di:waypoint x="500" y="237" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_4_di" bpmnElement="Flow_4"><di:waypoint x="760" y="142" /><di:waypoint x="870" y="200" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_5_di" bpmnElement="Flow_5"><di:waypoint x="760" y="237" /><di:waypoint x="870" y="200" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_6_di" bpmnElement="Flow_6"><di:waypoint x="1230" y="200" /><di:waypoint x="1300" y="200" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_7_di" bpmnElement="Flow_7"><di:waypoint x="1730" y="175" /><di:waypoint x="1840" y="175" /><di:waypoint x="1840" y="740" /><di:waypoint x="1900" y="740" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_8_di" bpmnElement="Flow_8"><di:waypoint x="1730" y="195" /><di:waypoint x="1865" y="195" /><di:waypoint x="1865" y="805" /><di:waypoint x="1900" y="805" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_9_di" bpmnElement="Flow_9"><di:waypoint x="1730" y="215" /><di:waypoint x="1890" y="215" /><di:waypoint x="1890" y="670" /><di:waypoint x="1900" y="670" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_10_di" bpmnElement="Flow_10"><di:waypoint x="1730" y="235" /><di:waypoint x="1915" y="235" /><di:waypoint x="1915" y="685" /><di:waypoint x="1900" y="685" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_11_di" bpmnElement="Flow_11"><di:waypoint x="1730" y="185" /><di:waypoint x="1760" y="185" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_12_di" bpmnElement="Flow_12"><di:waypoint x="1730" y="245" /><di:waypoint x="1760" y="315" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_13_di" bpmnElement="Flow_13"><di:waypoint x="2060" y="185" /><di:waypoint x="2140" y="185" /><di:waypoint x="2140" y="740" /><di:waypoint x="2180" y="740" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_14_di" bpmnElement="Flow_14"><di:waypoint x="2060" y="210" /><di:waypoint x="2160" y="210" /><di:waypoint x="2160" y="805" /><di:waypoint x="2180" y="805" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_15_di" bpmnElement="Flow_15"><di:waypoint x="2180" y="740" /><di:waypoint x="600" y="740" /><di:waypoint x="600" y="175" /><di:waypoint x="630" y="175" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_16_di" bpmnElement="Flow_16"><di:waypoint x="2180" y="805" /><di:waypoint x="630" y="805" /><di:waypoint x="630" y="175" /><di:waypoint x="640" y="175" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_18_di" bpmnElement="Flow_18"><di:waypoint x="1730" y="205" /><di:waypoint x="1880" y="205" /><di:waypoint x="1880" y="805" /><di:waypoint x="1900" y="805" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_19_di" bpmnElement="Flow_19"><di:waypoint x="2010" y="830" /><di:waypoint x="2010" y="870" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_20_di" bpmnElement="Flow_20"><di:waypoint x="1900" y="900" /><di:waypoint x="1450" y="900" /><di:waypoint x="1450" y="250" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_21_di" bpmnElement="Flow_21"><di:waypoint x="2060" y="315" /><di:waypoint x="2060" y="670" /><di:waypoint x="1900" y="670" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_22_di" bpmnElement="Flow_22"><di:waypoint x="1900" y="650" /><di:waypoint x="240" y="650" /><di:waypoint x="240" y="122" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_23_di" bpmnElement="Flow_23"><di:waypoint x="1900" y="690" /><di:waypoint x="280" y="690" /><di:waypoint x="280" y="187" /></bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Assoc_1_di" bpmnElement="Assoc_1"><di:waypoint x="1400" y="240" /><di:waypoint x="1425" y="475" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Assoc_2_di" bpmnElement="Assoc_2"><di:waypoint x="1500" y="240" /><di:waypoint x="1635" y="475" /></bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>`;
+
+        const viewer = new BpmnJS({ container: "#bpmnCanvas" });
+        const zoomInBtn = document.getElementById("zoomInBtn");
+        const zoomOutBtn = document.getElementById("zoomOutBtn");
+        const zoomResetBtn = document.getElementById("zoomResetBtn");
+        let currentZoom = 0.9;
+
+        viewer.importXML(bpmnXml)
+            .then(() => {
+                const canvas = viewer.get("canvas");
+                const canvasEl = document.getElementById("bpmnCanvas");
+
+                const initialViewbox = {
+                    x: 100,
+                    y: 80,
+                    width: 1200,
+                    height: 620
+                };
+
+                canvas.viewbox({
+                    x: initialViewbox.x,
+                    y: initialViewbox.y,
+                    width: initialViewbox.width,
+                    height: initialViewbox.height
+                });
+                canvas.zoom(0.9);
+                if (zoomResetBtn) {
+                    zoomResetBtn.textContent = "90%";
+                }
+
+                function setZoom(nextZoom) {
+                    const bounded = Math.max(0.4, Math.min(2.2, nextZoom));
+                    currentZoom = bounded;
+                    canvas.zoom(bounded);
+                    if (zoomResetBtn) {
+                        zoomResetBtn.textContent = Math.round(bounded * 100) + "%";
+                    }
+                }
+
+                if (zoomInBtn) zoomInBtn.addEventListener("click", () => setZoom(currentZoom + 0.1));
+                if (zoomOutBtn) zoomOutBtn.addEventListener("click", () => setZoom(currentZoom - 0.1));
+                if (zoomResetBtn) {
+                    zoomResetBtn.addEventListener("click", () => {
+                        setZoom(0.9);
+                        canvas.viewbox({
+                            x: initialViewbox.x,
+                            y: initialViewbox.y,
+                            width: initialViewbox.width,
+                            height: initialViewbox.height
+                        });
+                    });
+                }
+
+                if (canvasEl) {
+                    let dragging = false;
+                    let startX = 0;
+                    let startY = 0;
+                    let startBox = null;
+
+                    canvasEl.style.cursor = "grab";
+
+                    canvasEl.addEventListener("mousedown", (event) => {
+                        if (event.button !== 0) return;
+                        dragging = true;
+                        startX = event.clientX;
+                        startY = event.clientY;
+                        startBox = canvas.viewbox();
+                        canvasEl.style.cursor = "grabbing";
+                    });
+
+                    window.addEventListener("mouseup", () => {
+                        dragging = false;
+                        canvasEl.style.cursor = "grab";
+                    });
+
+                    window.addEventListener("mousemove", (event) => {
+                        if (!dragging || !startBox) return;
+                        const dx = (event.clientX - startX) / currentZoom;
+                        const dy = (event.clientY - startY) / currentZoom;
+                        canvas.viewbox({
+                            x: startBox.x - dx,
+                            y: startBox.y - dy,
+                            width: startBox.width,
+                            height: startBox.height
+                        });
+                    });
+                }
+            })
+            .catch((error) => {
+                console.error("Failed to render BPMN diagram:", error);
+            });
+    </script>
+</body>
+</html>

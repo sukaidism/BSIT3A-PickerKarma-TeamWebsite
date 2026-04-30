@@ -98,28 +98,16 @@ a {
     position: relative;
 }
 
-.nav-link::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: -0.4rem;
-    height: 2px;
-    border-radius: 999px;
-    background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
-    transform: scaleX(0);
-    transform-origin: center;
-    transition: transform 0.2s ease;
+.site-header .nav-link,
+.site-header .nav-link:visited,
+.site-header .nav-link:hover,
+.site-header .nav-link:focus {
+    text-decoration: none;
 }
 
 .nav-link:hover,
 .nav-link.active {
     color: var(--foreground);
-}
-
-.nav-link:hover::after,
-.nav-link.active::after {
-    transform: scaleX(1);
 }
 
 .hero {
