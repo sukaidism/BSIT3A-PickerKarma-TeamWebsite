@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PickerKarma - C4 Diagrams</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Calistoga&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
+    <link rel="stylesheet" href="app.css">
+    <style>
+        .c4-page {
+            min-height: 100vh;
+            background: #1b1230;
+            color: #f3ebff;
+            padding: 6rem 0 3rem;
+        }
+
+        .c4-shell {
+            border: 1px solid rgba(216, 196, 255, 0.25);
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.05);
+            box-shadow: var(--shadow-md);
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .c4-level-tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.55rem;
+            border-radius: 999px;
+            border: 1px solid rgba(216, 196, 255, 0.3);
+            color: #e9d5ff;
+            background: rgba(109, 40, 217, 0.2);
+            font-family: "JetBrains Mono", monospace;
+            font-size: 0.7rem;
+            letter-spacing: 0.07em;
+            text-transform: uppercase;
+        }
+
+        .c4-title-row {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+            margin-bottom: 0.4rem;
+        }
+
+        .c4-subtext {
+            margin: 0 0 0.9rem;
+            color: #d3c7e8;
+            font-size: 0.92rem;
+        }
+
+        .c4-image-wrap {
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(216, 196, 255, 0.22);
+            background: #ecebf0;
+        }
+
+        .c4-image {
+            width: 100%;
+            display: block;
+            height: auto;
+        }
+
+        .c4-caption {
+            margin: 0.65rem 0 0;
+            color: #d8c7ef;
+            font-size: 0.86rem;
+        }
+
+        .c4-nav-links {
+            margin-top: 1rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.65rem;
+        }
+    </style>
+</head>
+<body class="page-home">
+    <header class="site-header" id="siteHeader">
+        <div class="container header-inner">
+            <a class="brand" href="index.html#home">PickerKarma</a>
+            <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation" aria-expanded="false" aria-controls="siteNav">
+                <i class="fa-solid fa-bars" aria-hidden="true"></i>
+            </button>
+            <nav class="nav" id="siteNav" aria-label="Main navigation">
+                <a class="nav-link" href="index.html#home">Home</a>
+                <a class="nav-link" href="index.html#team">Team</a>
+                <a class="nav-link" href="index.html#project">Project</a>
+                <a class="nav-link" href="index.html#video">Video</a>
+                <a class="nav-link" href="index.html#updates">Updates</a>
+                <a class="nav-link" href="c4-diagrams.html">Diagrams</a>
+                <a class="nav-link" href="integration-guidelines.html">Integration Guide</a>
+                <a class="nav-link" href="api-docs.html">API Docs</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="c4-page">
+        <section class="container">
+            <div class="section-head reveal">
+                <div class="section-label">
+                    <span class="label-dot pulsing-dot"></span>
+                    <span>C4 Model</span>
+                </div>
+                <h2>Barangay Platform C4 Architecture Diagrams</h2>
+                <p>
+                    This page presents the C4 model in standard progression: <strong>Level 1 (System Context)</strong>,
+                    <strong>Level 2 (Container)</strong>, and <strong>Level 3 (Component)</strong>.
+                </p>
+            </div>
+
+            <article class="c4-shell reveal">
+                <div class="c4-title-row">
+                    <span class="c4-level-tag">Level 1</span>
+                    <h3>System Context Diagram</h3>
+                </div>
+                <p class="c4-subtext">
+                    Shows the Barangay Platform as a single system, its primary users, and key external dependencies.
+                </p>
+                <div class="c4-image-wrap">
+                    <img class="c4-image" src="assets/c4-system-context.png" alt="C4 Level 1 System Context diagram showing Resident, Barangay Admin/Staff, Barangay Platform, SMTP server, and Stripe relationships.">
+                </div>
+                <p class="c4-caption">Scope: people and external systems around the platform boundary.</p>
+            </article>
+
+            <article class="c4-shell reveal">
+                <div class="c4-title-row">
+                    <span class="c4-level-tag">Level 2</span>
+                    <h3>Container Diagram</h3>
+                </div>
+                <p class="c4-subtext">
+                    Breaks the platform into runtime/building containers (frontend, backend, database, cache, queue, storage) and their interactions.
+                </p>
+                <div class="c4-image-wrap">
+                    <img class="c4-image" src="assets/c4-container.png" alt="C4 Level 2 Container diagram for Barangay Platform with frontend, Laravel backend, MySQL database, cache, queue worker, storage, SMTP, and Stripe.">
+                </div>
+                <p class="c4-caption">Scope: deployable/operational containers and communication paths.</p>
+            </article>
+
+            <article class="c4-shell reveal">
+                <div class="c4-title-row">
+                    <span class="c4-level-tag">Level 3</span>
+                    <h3>Component Diagram (Document Request Module)</h3>
+                </div>
+                <p class="c4-subtext">
+                    Details internal components in the Document Request module, including controller, service, request validation, models, and notification flow.
+                </p>
+                <div class="c4-image-wrap">
+                    <img class="c4-image" src="assets/c4-component.png" alt="C4 Level 3 Component diagram for Document Request module with controller, service, request object, domain models, notifications, and database tables.">
+                </div>
+                <p class="c4-caption">Scope: internal code-level components for one module boundary.</p>
+            </article>
+
+            <div class="c4-nav-links reveal">
+                <a class="btn btn-outline" href="index.html#updates"><i class="fa-solid fa-arrow-left"></i> Back to Updates</a>
+                <a class="btn btn-outline" href="bpmn-diagram.html">Open BPMN Diagram</a>
+                <a class="btn btn-outline" href="system-architecture.html">Open System Architecture Diagram</a>
+            </div>
+        </section>
+    </main>
+
+    <script src="app.js" defer></script>
+</body>
+</html>
