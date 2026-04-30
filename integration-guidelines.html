@@ -33,6 +33,7 @@
                 <p class="sidebar-group">Architecture</p>
                 <a class="side-link" href="#architecture">Architecture Overview</a>
                 <a class="side-link" href="#components">System Components</a>
+                <a class="side-link" href="#database-schema">Database Schema (DDL)</a>
                 <a class="side-link" href="#data-flow">Data Flow</a>
                 <a class="side-link" href="#scalability">Scalability</a>
                 <a class="side-link" href="#security">Security</a>
@@ -291,6 +292,225 @@
                         </ul>
                     </div>
                 </div>
+            </section>
+
+            <section id="database-schema" class="doc-section">
+                <h2>Database Schema (DDL Only)</h2>
+                <p>
+                    This section presents the PickerKarma schema as a per-table design reference based on
+                    <code>pickerkarma-db.sql</code>. It includes <strong>DDL only</strong> (table structure,
+                    keys, indexes, and relationships) and excludes all DML records.
+                </p>
+
+                <div class="schema-grid">
+                    <article class="schema-card">
+                        <div class="schema-head">
+                            <h3><code>users</code></h3>
+                            <span class="schema-badge">Core</span>
+                        </div>
+                        <p class="muted">Master account table for residents and admins.</p>
+                        <div class="table-wrap">
+                            <table>
+                                <thead><tr><th>Column</th><th>Type</th><th>Notes</th></tr></thead>
+                                <tbody>
+                                    <tr><td><code>id</code></td><td>bigint unsigned</td><td>Primary key</td></tr>
+                                    <tr><td><code>name</code></td><td>varchar(255)</td><td>Display name</td></tr>
+                                    <tr><td><code>email</code></td><td>varchar(255)</td><td>Unique login email</td></tr>
+                                    <tr><td><code>verification_status</code></td><td>enum(...)</td><td>Resident verification state</td></tr>
+                                    <tr><td><code>is_admin</code></td><td>tinyint(1)</td><td>Admin flag</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <ul class="schema-meta">
+                            <li><strong>PK:</strong> <code>id</code></li>
+                            <li><strong>Unique:</strong> <code>users_email_unique (email)</code></li>
+                            <li><strong>Referenced by:</strong> <code>resident_profiles</code>, <code>document_requests</code>, <code>incident_reports</code>, <code>community_events</code>, <code>event_registrations</code></li>
+                        </ul>
+                    </article>
+
+                    <article class="schema-card">
+                        <div class="schema-head">
+                            <h3><code>resident_profiles</code></h3>
+                            <span class="schema-badge">Resident</span>
+                        </div>
+                        <p class="muted">Extended demographic and verification profile for each resident account.</p>
+                        <div class="table-wrap">
+                            <table>
+                                <thead><tr><th>Column</th><th>Type</th><th>Notes</th></tr></thead>
+                                <tbody>
+                                    <tr><td><code>id</code></td><td>bigint unsigned</td><td>Primary key</td></tr>
+                                    <tr><td><code>user_id</code></td><td>bigint unsigned</td><td>FK to <code>users.id</code></td></tr>
+                                    <tr><td><code>first_name ... suffix</code></td><td>varchar</td><td>Name components</td></tr>
+                                    <tr><td><code>gender</code>, <code>civil_status</code></td><td>enum</td><td>Profile attributes</td></tr>
+                                    <tr><td><code>verified_by</code></td><td>bigint unsigned</td><td>Admin verifier</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <ul class="schema-meta">
+                            <li><strong>PK:</strong> <code>id</code></li>
+                            <li><strong>FK:</strong> <code>user_id -> users.id (CASCADE)</code></li>
+                            <li><strong>FK:</strong> <code>verified_by -> users.id (SET NULL)</code></li>
+                        </ul>
+                    </article>
+
+                    <article class="schema-card">
+                        <div class="schema-head">
+                            <h3><code>community_events</code></h3>
+                            <span class="schema-badge">Events</span>
+                        </div>
+                        <p class="muted">Barangay event definitions and registration windows.</p>
+                        <div class="table-wrap">
+                            <table>
+                                <thead><tr><th>Column</th><th>Type</th><th>Notes</th></tr></thead>
+                                <tbody>
+                                    <tr><td><code>id</code></td><td>bigint unsigned</td><td>Primary key</td></tr>
+                                    <tr><td><code>title</code>, <code>description</code>, <code>venue</code></td><td>varchar/text</td><td>Event metadata</td></tr>
+                                    <tr><td><code>starts_at</code>, <code>ends_at</code></td><td>datetime</td><td>Main schedule</td></tr>
+                                    <tr><td><code>registration_starts_at</code>, <code>registration_ends_at</code></td><td>datetime</td><td>Registration window</td></tr>
+                                    <tr><td><code>status</code>, <code>is_live_now</code>, <code>created_by</code></td><td>enum/tinyint/fk</td><td>Lifecycle + owner</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <ul class="schema-meta">
+                            <li><strong>PK:</strong> <code>id</code></li>
+                            <li><strong>FK:</strong> <code>created_by -> users.id (SET NULL)</code></li>
+                            <li><strong>Indexes:</strong> <code>ce_status_starts_idx</code>, <code>ce_reg_window_idx</code></li>
+                        </ul>
+                    </article>
+
+                    <article class="schema-card">
+                        <div class="schema-head">
+                            <h3><code>event_registrations</code></h3>
+                            <span class="schema-badge">Events</span>
+                        </div>
+                        <p class="muted">Per-user event registration, payment, ticket, and check-in state.</p>
+                        <div class="table-wrap">
+                            <table>
+                                <thead><tr><th>Column</th><th>Type</th><th>Notes</th></tr></thead>
+                                <tbody>
+                                    <tr><td><code>id</code></td><td>bigint unsigned</td><td>Primary key</td></tr>
+                                    <tr><td><code>community_event_id</code>, <code>user_id</code></td><td>bigint unsigned</td><td>Event and participant</td></tr>
+                                    <tr><td><code>status</code>, <code>payment_status</code></td><td>enum</td><td>Registration lifecycle</td></tr>
+                                    <tr><td><code>ticket_code</code>, <code>qr_signature</code></td><td>varchar</td><td>Ticket and QR integrity</td></tr>
+                                    <tr><td><code>checked_in_at</code>, <code>checked_in_by</code></td><td>timestamp/fk</td><td>Attendance trail</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <ul class="schema-meta">
+                            <li><strong>PK:</strong> <code>id</code></li>
+                            <li><strong>Unique:</strong> <code>er_event_user_unique</code>, <code>ticket_code</code>, <code>stripe_session_id</code></li>
+                            <li><strong>FK:</strong> <code>community_event_id -> community_events.id (CASCADE)</code>, <code>user_id -> users.id (CASCADE)</code>, <code>checked_in_by -> users.id (SET NULL)</code></li>
+                        </ul>
+                    </article>
+
+                    <article class="schema-card">
+                        <div class="schema-head">
+                            <h3><code>document_requests</code></h3>
+                            <span class="schema-badge">Documents</span>
+                        </div>
+                        <p class="muted">Resident document requests with approval and external doc callback fields.</p>
+                        <div class="table-wrap">
+                            <table>
+                                <thead><tr><th>Column</th><th>Type</th><th>Notes</th></tr></thead>
+                                <tbody>
+                                    <tr><td><code>id</code></td><td>bigint unsigned</td><td>Primary key</td></tr>
+                                    <tr><td><code>user_id</code></td><td>bigint unsigned</td><td>Request owner</td></tr>
+                                    <tr><td><code>control_number</code></td><td>varchar(255)</td><td>Unique request code</td></tr>
+                                    <tr><td><code>status</code>, <code>approved_by</code>, <code>approved_at</code></td><td>status/fk/time</td><td>Approval lifecycle</td></tr>
+                                    <tr><td><code>stripe_*</code>, <code>document_url</code></td><td>varchar</td><td>Payment + generated file link</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <ul class="schema-meta">
+                            <li><strong>PK:</strong> <code>id</code></li>
+                            <li><strong>Unique:</strong> <code>document_requests_control_number_unique</code></li>
+                            <li><strong>FK:</strong> <code>user_id -> users.id (CASCADE)</code>, <code>approved_by -> users.id (SET NULL)</code></li>
+                        </ul>
+                    </article>
+
+                    <article class="schema-card">
+                        <div class="schema-head">
+                            <h3><code>incident_reports</code></h3>
+                            <span class="schema-badge">Incidents</span>
+                        </div>
+                        <p class="muted">Case record for complaint intake, mediation, payment, and closure workflow.</p>
+                        <div class="table-wrap">
+                            <table>
+                                <thead><tr><th>Column</th><th>Type</th><th>Notes</th></tr></thead>
+                                <tbody>
+                                    <tr><td><code>id</code></td><td>bigint unsigned</td><td>Primary key</td></tr>
+                                    <tr><td><code>user_id</code>, <code>control_number</code></td><td>fk/varchar</td><td>Owner and case code</td></tr>
+                                    <tr><td><code>incident_category</code>, <code>incident_date</code>, <code>incident_location</code></td><td>varchar/date</td><td>Case context</td></tr>
+                                    <tr><td><code>status</code>, <code>reviewed_by</code>, <code>mediator_id</code>, <code>closed_by</code></td><td>status/fk</td><td>Case lifecycle control</td></tr>
+                                    <tr><td><code>ai_summary</code>, <code>resolution_summary</code></td><td>text</td><td>Automation + closure details</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <ul class="schema-meta">
+                            <li><strong>PK:</strong> <code>id</code></li>
+                            <li><strong>Unique:</strong> <code>incident_reports_control_number_unique</code></li>
+                            <li><strong>FK:</strong> <code>user_id</code>, <code>reviewed_by</code>, <code>mediator_id</code>, <code>closed_by</code> -> <code>users.id</code></li>
+                        </ul>
+                    </article>
+
+                    <article class="schema-card">
+                        <div class="schema-head">
+                            <h3><code>blotter_hearings</code></h3>
+                            <span class="schema-badge">Incidents</span>
+                        </div>
+                        <p class="muted">Schedules and outcomes for mediation hearings per incident case.</p>
+                        <div class="table-wrap">
+                            <table>
+                                <thead><tr><th>Column</th><th>Type</th><th>Notes</th></tr></thead>
+                                <tbody>
+                                    <tr><td><code>id</code></td><td>bigint unsigned</td><td>Primary key</td></tr>
+                                    <tr><td><code>incident_report_id</code></td><td>bigint unsigned</td><td>Parent case FK</td></tr>
+                                    <tr><td><code>hearing_no</code>, <code>scheduled_at</code>, <code>location</code></td><td>int/time/varchar</td><td>Hearing scheduling</td></tr>
+                                    <tr><td><code>mediator_id</code></td><td>bigint unsigned</td><td>Assigned mediator</td></tr>
+                                    <tr><td><code>outcome</code>, <code>notes</code></td><td>varchar/text</td><td>Disposition and narrative</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <ul class="schema-meta">
+                            <li><strong>PK:</strong> <code>id</code></li>
+                            <li><strong>FK:</strong> <code>incident_report_id -> incident_reports.id (CASCADE)</code></li>
+                            <li><strong>FK:</strong> <code>mediator_id -> users.id (SET NULL)</code></li>
+                        </ul>
+                    </article>
+
+                    <article class="schema-card">
+                        <div class="schema-head">
+                            <h3><code>notifications</code></h3>
+                            <span class="schema-badge">System</span>
+                        </div>
+                        <p class="muted">Persistent application notifications using polymorphic notifiable target.</p>
+                        <div class="table-wrap">
+                            <table>
+                                <thead><tr><th>Column</th><th>Type</th><th>Notes</th></tr></thead>
+                                <tbody>
+                                    <tr><td><code>id</code></td><td>char(36)</td><td>UUID primary key</td></tr>
+                                    <tr><td><code>type</code></td><td>varchar(255)</td><td>Notification class type</td></tr>
+                                    <tr><td><code>notifiable_type</code>, <code>notifiable_id</code></td><td>varchar/bigint</td><td>Polymorphic owner</td></tr>
+                                    <tr><td><code>data</code></td><td>text</td><td>Serialized payload</td></tr>
+                                    <tr><td><code>read_at</code>, <code>created_at</code>, <code>updated_at</code></td><td>timestamp</td><td>Read and audit fields</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <ul class="schema-meta">
+                            <li><strong>PK:</strong> <code>id</code></li>
+                            <li><strong>Index:</strong> <code>notifications_notifiable_type_notifiable_id_index</code></li>
+                        </ul>
+                    </article>
+                </div>
+
+                <h3>Supporting Infrastructure Tables (DDL)</h3>
+                <p class="muted">
+                    The schema also includes framework and infrastructure tables:
+                    <code>cache</code>, <code>cache_locks</code>, <code>failed_jobs</code>,
+                    <code>jobs</code>, <code>job_batches</code>, <code>migrations</code>,
+                    <code>password_reset_tokens</code>, <code>personal_access_tokens</code>,
+                    and <code>sessions</code>.
+                </p>
             </section>
 
             <section id="data-flow" class="doc-section">

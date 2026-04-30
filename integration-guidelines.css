@@ -520,6 +520,59 @@ th { background: #f4efff; font-weight: 700; }
 .component-card ul { margin: 0; }
 .component-card li { font-size: 0.88rem; color: var(--muted-foreground); margin-bottom: 0.3rem; }
 
+/* ── DATABASE SCHEMA ─────────────────────────────────────────────── */
+
+.schema-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+    margin-top: 0.75rem;
+}
+
+.schema-card {
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 0.9rem;
+    background: linear-gradient(180deg, #ffffff, #fdfbff);
+}
+
+.schema-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-bottom: 0.45rem;
+}
+
+.schema-head h3 {
+    margin: 0;
+    font-size: 0.98rem;
+}
+
+.schema-badge {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.64rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border: 1px solid rgba(109, 40, 217, 0.28);
+    border-radius: 999px;
+    padding: 0.16rem 0.45rem;
+    color: var(--accent);
+    background: rgba(109, 40, 217, 0.08);
+    white-space: nowrap;
+}
+
+.schema-meta {
+    margin: 0.55rem 0 0;
+    padding-left: 1rem;
+}
+
+.schema-meta li {
+    font-size: 0.84rem;
+    color: var(--muted-foreground);
+    margin-bottom: 0.24rem;
+}
+
 /* ── FLOW STEPS ──────────────────────────────────────────────────── */
 
 .flow-steps {
@@ -718,6 +771,9 @@ th { background: #f4efff; font-weight: 700; }
         grid-template-columns: repeat(3, minmax(0, 1fr));
     }
     .consideration-grid {
+        grid-template-columns: 1fr;
+    }
+    .schema-grid {
         grid-template-columns: 1fr;
     }
 }
