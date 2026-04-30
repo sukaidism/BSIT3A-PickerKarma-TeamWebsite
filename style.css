@@ -101,8 +101,13 @@ a {
 .site-header .nav-link,
 .site-header .nav-link:visited,
 .site-header .nav-link:hover,
-.site-header .nav-link:focus {
-    text-decoration: none;
+.site-header .nav-link:focus,
+.site-header .nav a.nav-link,
+.site-header .nav a.nav-link:visited,
+.site-header .nav a.nav-link:hover,
+.site-header .nav a.nav-link:focus,
+.site-header .nav a.nav-link:active {
+    text-decoration: none !important;
 }
 
 .nav-link:hover,
